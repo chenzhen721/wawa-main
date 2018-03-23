@@ -7,8 +7,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -23,7 +21,6 @@ public abstract class JSONUtil {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final JsonFactory JSONFACTORY = new JsonFactory();
-    public static final TypeFactory typeFactory = TypeFactory.defaultInstance();
 
     /**
      * 转换Java Bean 为 json
@@ -45,14 +42,17 @@ public abstract class JSONUtil {
         }
     }
 
+    public static String beanToJson(JSONUtil.ToJson o) {
+        return o.toJsonString();
+    }
+
     /**
      * 转换Java Bean 为 HashMap
      */
     public static Map<String, Object> beanToMap(Object o) {
-        JavaType javaType = typeFactory.constructMapLikeType(HashMap.class, String.class, Object.class);
         try {
-            return jsonToBean(beanToJson(o), javaType);
-        } catch (Exception e) {
+            return (Map) MAPPER.readValue(beanToJson(o), HashMap.class);
+        } catch (IOException e) {
             throw new RuntimeException("转换失败", e);
         }
     }
@@ -62,10 +62,9 @@ public abstract class JSONUtil {
      * 转换Json String 为 HashMap
      */
     public static Map<String, Object> jsonToMap(String json) {
-        JavaType javaType = typeFactory.constructMapLikeType(HashMap.class, String.class, Object.class);
         try {
-            return jsonToBean(json, javaType);
-        } catch (Exception e) {
+            return (Map) MAPPER.readValue(json, HashMap.class);
+        } catch (IOException e) {
             throw new RuntimeException("转换失败", e);
         }
     }

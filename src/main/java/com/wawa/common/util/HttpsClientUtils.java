@@ -43,7 +43,7 @@ public abstract class HttpsClientUtils {
 
     static final Logger log = LoggerFactory.getLogger(HttpsClientUtils.class);
 
-    public static final Charset UTF8 =Charset.forName("UTF-8");
+    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     public static final Charset GB18030 =  Charset.forName("GB18030");
 
@@ -101,29 +101,29 @@ public abstract class HttpsClientUtils {
         return sr;
     }
 
-    public static String get(String url,Map<String,String> HEADERS)throws IOException {
+    public static String get(String url, Map<String,String> HEADERS)throws IOException {
         HttpGet get = new HttpGet(url);
         return execute(get,HEADERS,null);
     }
 
 
-    public static String get(String url,Map<String,String> HEADERS,Charset forceCharset)throws IOException{
+    public static String get(String url, Map<String,String> HEADERS, Charset forceCharset)throws IOException {
         HttpGet get = new HttpGet(url);
         return execute(get,HEADERS,forceCharset);
     }
 
-    public static String get(String url,Map<String,String> HEADERS,Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException{
+    public static String get(String url, Map<String,String> HEADERS, Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException {
         HttpGet get = new HttpGet(url);
         return execute(get,HEADERS, forceCharset, httpEntityHandler);
     }
 
-    public static String post(String url,Map<String,String> params,Map<String,String> headers) throws IOException{
+    public static String post(String url, Map<String,String> params, Map<String,String> headers) throws IOException {
         HttpPost post = new HttpPost(url);
         post.setEntity(new UrlEncodedFormEntity(buildParams(params), UTF8.name()));
         return execute(post,headers,null);
     }
 
-    public static String postJson(String url, String body) throws IOException{
+    public static String postJson(String url, String body) throws IOException {
         Map<String, String> headers = new HashMap<>();
         return postJson(url, body, headers);
     }
@@ -132,7 +132,7 @@ public abstract class HttpsClientUtils {
         return postJson(url, body, headers, null);
     }
 
-    public static String post(String url,Map<String,String> params,Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException{
+    public static String post(String url, Map<String,String> params, Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException {
         HttpPost post = new HttpPost(url);
         post.setEntity(new UrlEncodedFormEntity(buildParams(params), UTF8.name()));
         return execute(post,headers,null, httpEntityHandler);
@@ -145,11 +145,11 @@ public abstract class HttpsClientUtils {
         return execute(post, headers, null, httpEntityHandler);
     }
 
-    public static String put(String url,Map<String,String> params,Map<String,String> headers) throws IOException{
+    public static String put(String url, Map<String,String> params, Map<String,String> headers) throws IOException {
         return put(url, params, headers, null);
     }
 
-    public static String put(String url,Map<String,String> params,Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException{
+    public static String put(String url, Map<String,String> params, Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException {
         HttpPut put = new HttpPut(url);
         put.setEntity(new UrlEncodedFormEntity(buildParams(params), UTF8.name()));
         return execute(put,headers,null, httpEntityHandler);
@@ -166,21 +166,21 @@ public abstract class HttpsClientUtils {
         return ps;
     }
 
-    public static <T> T  http(HttpClient  client,HttpRequestBase request,Map<String,String> headers,HttpEntityHandler<T> handler)
+    public static <T> T  http(HttpClient  client, HttpRequestBase request, Map<String,String> headers, HttpEntityHandler<T> handler)
             throws IOException {
         return HttpClientUtils.http(client, request, headers, handler);
     }
 
 
-    private static String execute(final HttpRequestBase request,Map<String,String> headers,final Charset forceCharset)throws IOException{
+    private static String execute(final HttpRequestBase request, Map<String,String> headers, final Charset forceCharset)throws IOException {
         return execute(request,headers,forceCharset, null);
     }
 
-    private static String execute(final HttpRequestBase request,Map<String,String> headers,final Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException {
+    private static String execute(final HttpRequestBase request, Map<String,String> headers, final Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException {
         return http(HTTP_CLIENT,request,headers,httpEntityHandler != null ? httpEntityHandler : new HttpClientUtils.StringHttpEntityHandler(request.getMethod(), forceCharset));
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
 
         Map map = new HashMap();

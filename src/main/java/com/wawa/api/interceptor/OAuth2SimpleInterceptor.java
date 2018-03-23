@@ -15,6 +15,7 @@ import com.wawa.common.doc.Param;
 import com.wawa.common.doc.ParamKey;
 import com.wawa.common.util.AuthCode;
 import com.wawa.common.util.KeyUtils;
+import com.wawa.common.util.RandomExtUtils;
 import com.wawa.model.Finance;
 import com.wawa.model.User;
 import com.wawa.model.UserType;
@@ -299,7 +300,7 @@ public class OAuth2SimpleInterceptor extends HandlerInterceptorAdapter {
         String nick_name = basicInfoWithTuid.nick_name;
         //生成nickname
         if (StringUtils.isEmpty(nick_name)) {
-            nick_name = NICK_NAME_PREFIX + AuthCode.random(6);
+            nick_name = NICK_NAME_PREFIX + RandomExtUtils.random(6);
         }
         for (String field : needFields) {
             Object value = basicInfoWithTuid.get(field);

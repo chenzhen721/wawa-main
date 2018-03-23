@@ -19,7 +19,7 @@ public  class MsgExecutor
        //Math.max(400,Integer.parseInt(MIN_SIZE))
     //Math.max(500,Integer.parseInt(MAX_SIZE))
     static final BaseThreadPoolExecutor PUB_SUB =
-            new BaseThreadPoolExecutor(Integer.parseInt(MIN_SIZE),Integer.parseInt(MAX_SIZE),
+            new BaseThreadPoolExecutor(Integer.parseInt(MIN_SIZE), Integer.parseInt(MAX_SIZE),
                     60L, TimeUnit.SECONDS,
                     new LinkedBlockingQueue<Runnable>(),
                     new CustomizableThreadFactory("ChatExecutor.EXE")) ;

@@ -1,6 +1,5 @@
 package com.wawa.common.util;
 
-import org.apache.commons.codec.binary.*;
 import org.apache.commons.lang.StringUtils;
 
 import javax.crypto.Cipher;
@@ -343,11 +342,11 @@ public class SecurityUtils {
         }
 
         private static byte uniteBytes(byte src0, byte src1) {
-            char b0 = (char)Byte.decode("0x" + new String(new byte[] {src0}))
+            char b0 = (char) Byte.decode("0x" + new String(new byte[] {src0}))
                     .byteValue();
             final int bitOffset = 4;
             b0 = (char) (b0 << bitOffset);
-            char b1 = (char)Byte.decode("0x" + new String(new byte[] {src1}))
+            char b1 = (char) Byte.decode("0x" + new String(new byte[] {src1}))
                     .byteValue();
             byte ret = (byte) (b0 ^ b1);
             return ret;
@@ -478,7 +477,7 @@ public class SecurityUtils {
     //    }
     }
 
-    public static void main(String args[])throws Exception{
+    public static void main(String args[])throws Exception {
         String aa = RC4.encrypt("aaaaa");
         System.out.println(aa);
 

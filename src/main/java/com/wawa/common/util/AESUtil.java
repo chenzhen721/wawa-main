@@ -1,13 +1,13 @@
 package com.wawa.common.util;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  *  AES加密解密
@@ -47,7 +47,7 @@ public class AESUtil {
             keyGenerator.init(256, new SecureRandom(keyBytes));
             SecretKey key=keyGenerator.generateKey();*/
             SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
-            Cipher cipher=Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher= Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(iv));
             byte[] result=cipher.doFinal(content);
             return result;
@@ -71,7 +71,7 @@ public class AESUtil {
             keyGenerator.init(256, new SecureRandom(keyBytes));//key长可设为128，192，256位，这里只能设为128
             SecretKey key=keyGenerator.generateKey();*/
             SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
-            Cipher cipher=Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher= Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(iv));
             byte[] result=cipher.doFinal(content);
             return result;

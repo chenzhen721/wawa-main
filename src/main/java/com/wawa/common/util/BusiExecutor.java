@@ -18,7 +18,7 @@ public class BusiExecutor implements ServletContextListener {
    private static final String MIN_SIZE = AppProperties.get("buss.thread.minSize");
    private static final String MAX_SIZE = AppProperties.get("buss.thread.maxSize");
    static final BaseThreadPoolExecutor EXE =
-           new BaseThreadPoolExecutor(Integer.parseInt(MIN_SIZE),Integer.parseInt(MAX_SIZE),
+           new BaseThreadPoolExecutor(Integer.parseInt(MIN_SIZE), Integer.parseInt(MAX_SIZE),
                                    60L, TimeUnit.SECONDS,
                                    new LinkedBlockingQueue<Runnable>(),
                                    new CustomizableThreadFactory("StaticNewSpring.EXE")) ;

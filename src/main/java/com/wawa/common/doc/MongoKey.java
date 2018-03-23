@@ -29,8 +29,6 @@ public interface MongoKey {
     String $exists = "$exists";
 
 
-
-
     //aggregate  pipeline operators
     String $match = "$match";
     String $project = "$project";
@@ -53,14 +51,16 @@ public interface MongoKey {
 
     String $natural = "$natural";//sort( { $natural: 1 } )documents in the order they exist on disk
 
-    String timestamp ="timestamp";
+    String timestamp = "timestamp";
 
     // Boolean.FALSE == update({_id:1},{$setOnInsert:{..}}).getField("updatedExisting")
     String updatedExisting = "updatedExisting";
 
-    DBObject ID_DESC = new BasicDBObject(_id,-1);
+    DBObject SJ_DESC = new UnmodifDBObject(new BasicDBObject(timestamp, -1));
+    DBObject NATURAL_DESC = new UnmodifDBObject(new BasicDBObject($natural, -1));
+    DBObject ID_DESC = new UnmodifDBObject(new BasicDBObject(_id, -1));
     DBObject ALL_FIELD = null;
     DBObject NO_SORT = null;
-    DBObject SJ_DESC = new BasicDBObject(timestamp, -1);
+    DBObject EMPTY = new UnmodifDBObject(Collections.emptyMap());
 
 }

@@ -1,7 +1,10 @@
 package com.wawa.common.util;
 
-
+import com.wawa.service.image.SkewImageSimple;
+import lombok.Cleanup;
 import net.coobird.thumbnailator.Thumbnails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,6 +14,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
@@ -19,38 +23,59 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *  验证码生成类
- *  2013-03-18 15:20
  */
 public abstract class AuthCode {
 
+    static final Logger logger = LoggerFactory.getLogger(AuthCode.class) ;
     static final Color COLORS[] = {new Color(113, 31, 71), new Color(37, 0, 37), new Color(111, 33, 36),
             new Color(116, 86, 88),new Color(14, 51, 16),new Color(1, 1, 1), new Color(0, 0, 112),
             new Color(72, 14, 73),new Color(65, 67, 29),new Color(41, 75, 71)};
 
-    static  final char[] SEEDS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
-
-    public static String random(int size){
-        if(size<=0){
-            throw new IllegalArgumentException("size must > 0");
-        }
-        char[] result = new char[size];
-        Random random = ThreadLocalRandom.current();
-        int len = SEEDS.length;
-        for(int i =0 ;i<size ; i++){
-            result[i] = SEEDS[random.nextInt(len)];
-        }
-        return new String (result);
-    }
-
-
-    static final GraphicsConfiguration  GC = getGraphicsConfiguration();
+    static final GraphicsConfiguration GC = getGraphicsConfiguration();
 
     private static GraphicsConfiguration getGraphicsConfiguration() {
         Graphics2D _2D = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
-        return _2D.getDeviceConfiguration();
+
+        GraphicsConfiguration config = _2D.getDeviceConfiguration();
+
+        return  config ;
+    }
+ /*   static
+    {
+        logger.error("AuthCode1 init---------------->:begin");
+
+        int colorLenth = COLORS.length;
+        logger.info("colorLenth---------------->:"+colorLenth);
+        int seedsLenth = SEEDS.length;
+        logger.info("seedsLenth---------------->:"+seedsLenth);
+
+        logger.error("AuthCode1 init---------------->:end");
+    }*/
+
+    private static final SkewImageSimple skewSimple = new SkewImageSimple();
+
+/*    static
+    {
+        logger.error("AuthCode2 init---------------->:begin");
+        if(null != skewSimple)
+            logger.info("skewSimple---------------->:is not null");
+        logger.error("AuthCode2 init---------------->:end");
+    }*/
+
+    //private static final SkewImageProba skewProba = new SkewImageProba();
+
+    public static void  drawSkew(String code , int width, int height, OutputStream out) throws IOException {
+       // int res = (int)System.currentTimeMillis()&1 ;
+     //  BufferedImage img = res == 1 ? skewProba.skewImage(code,width,height) : skewSimple.skewImage(code,width,height);
+        BufferedImage img =  skewSimple.skewImage(code,width,height)  ;
+//        ImageIO.write(img, "jpeg",buff);
+        try( OutputStream buff = new BufferedOutputStream(out) ){
+            ImageIO.write(img, "png",buff);
+        }
     }
 
-    public static void  draw(String code ,int width,int height,OutputStream out) throws IOException{
+    public static void  draw(String code , int width, int height, OutputStream out) throws IOException
+    {
         char[] chars =code.toCharArray();
 		int len = chars.length;
 		int xx = (int) (width / ( len+0.618));
@@ -73,9 +98,8 @@ public abstract class AuthCode {
 			graphics.drawString(String.valueOf(chars[i]), (float) ((i +1-0.618) * xx), codeY);
 		}
         //绘画之前扭曲 BufferedOutputStream FIX EOFException  Broken Pipe
-        OutputStream buff = new BufferedOutputStream(out);
+        @Cleanup OutputStream buff = new BufferedOutputStream(out);
         ImageIO.write(doTwist(buffImg,graphics), "png",buff);
-        buff.close();
 
 //        ByteArrayOutputStream out_arr = new ByteArrayOutputStream(20480);
 //        AuthCode.draw(code, 160, 48, out_arr);
@@ -88,7 +112,7 @@ public abstract class AuthCode {
 	 * 
 	 * 正弦曲线Wave扭曲图片 & 干扰线
 	 */
-	static BufferedImage doTwist(BufferedImage buffImg,Graphics2D graphics) {
+	static BufferedImage doTwist(BufferedImage buffImg, Graphics2D graphics) {
 
 
         int width=buffImg.getWidth();
@@ -125,7 +149,7 @@ public abstract class AuthCode {
 		return destBi;
 	}
 
-    static final double ROUND = Math.PI * Math.E /Math.sqrt(3);
+    static final double ROUND = Math.PI * Math.E / Math.sqrt(3);
     /**
 	 * 获取扭曲后的x轴位置
 	 */
@@ -137,7 +161,7 @@ public abstract class AuthCode {
 		return xPosition + (int) (dy * dMultValue);
 	}
 
-    public static BufferedImage cutImage(BufferedImage bi,int left,int top,int width,int height) {
+    public static BufferedImage cutImage(BufferedImage bi, int left, int top, int width, int height) {
         height = Math.min(height, bi.getHeight());
         width = Math.min(width, bi.getWidth());
         if(height <= 0) height = bi.getHeight();
@@ -149,6 +173,7 @@ public abstract class AuthCode {
 //        ImageIO.write(, "jpeg", out);
 //        out.close();
     }
+
     public static BufferedImage compressImage(BufferedImage srcImage, int maxWidth, int maxHeight) {
         int srcWidth = srcImage.getWidth(null);
         int srcHeight = srcImage.getHeight(null);
@@ -161,7 +186,7 @@ public abstract class AuthCode {
         return op.filter(toBufferedImage(scaledImage), null);
     }
 
-    public static void compressImageNew(BufferedImage srcImage, int maxWidth, int maxHeight, File file) throws Exception{
+    public static void compressImageNew(BufferedImage srcImage, int maxWidth, int maxHeight, File file) throws Exception {
         int srcWidth = srcImage.getWidth(null);
         int srcHeight = srcImage.getHeight(null);
         double ratio = Math.min((double) maxWidth / srcWidth, (double) maxHeight / srcHeight);
@@ -219,15 +244,45 @@ public abstract class AuthCode {
         return bimage;
     }
 
-    public static void writeJpeg(BufferedImage srcImage,OutputStream out)throws IOException{
-        OutputStream buff = new BufferedOutputStream(out);
+    public static void writeJpeg(BufferedImage srcImage, OutputStream out)throws IOException {
+        @Cleanup OutputStream buff = new BufferedOutputStream(out);
         ImageIO.write(srcImage, "jpeg", buff); // BufferedOutputStream FIX EOFException  Broken Pipe
-        buff.close();
     }
-    public static void main(String[] args) throws Exception {
 
+   public static void main(String[] args) throws Exception {
 
-        draw("TTXY",160,48,new java.io.FileOutputStream("c:/authcode.png"));
+       //x=43&y=133&w=1003&h=752&rw=200&rh=150
+       int x=43;
+       int y=133;
+       int w=1003;
+       int h=752;
+       int rw=200;
+       int rh=150;
+       BufferedImage img = ImageIO.read(new java.io.FileInputStream("C:/upload/1.jpg"));
+       File file1 = new File("c:/upload","/test1.jpg");
+       File file2 = new File("c:/upload","/test2.jpg");
+       File file3 = new File("c:/upload","/test3.jpg");
+       File file4 = new File("c:/upload","/test4.jpg");
+       BufferedImage cutImg = AuthCode.cutImage(img,x,y,w,h);
+       //Thumbnails.of(cutImg).toFile(file1);
+       AuthCode.writeJpeg(cutImg,new FileOutputStream(file1));
+       AuthCode.writeJpeg(AuthCode.compressImage(cutImg,rw,rh),new FileOutputStream(file2));
+       Thumbnails.of(cutImg).size(rw,rh).keepAspectRatio(false).outputQuality(0.95).toFile(file2);
+
+       int srcWidth = cutImg.getWidth(null);
+       int srcHeight = cutImg.getHeight(null);
+       if(srcWidth <= rw && srcHeight <= rh){
+           return;
+       }
+       double ratio = Math.min((double) rw / srcWidth, (double) rh / srcHeight);
+       System.out.println(ratio);
+       Thumbnails.of(cutImg).scale(ratio).outputQuality(0.98).toFile(file3);
+       Thumbnails.of(cutImg).scale(ratio).outputQuality(1).toFile(file4);
+        //draw("xhgl",160,48,new java.io.FileOutputStream("c:/authcode.png"));
+
+        //drawSkew("X12B",160,48,new java.io.FileOutputStream("c:/authcode2.png"));
+
     }
+
 
 }

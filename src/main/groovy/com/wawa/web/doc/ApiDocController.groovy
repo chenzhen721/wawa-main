@@ -64,6 +64,6 @@ class ApiDocController extends BaseController {
             if(a.getId() != null)
                 actions[a.getId()] = a.name();
         }
-        return [code : Result.success.getCode(), actions : actions]
+        return [code: Result.success.getCode(), actions: actions]
     }
 }

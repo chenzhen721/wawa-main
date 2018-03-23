@@ -27,8 +27,8 @@ public abstract class GiftSendObserver {
      * @param count 数量
      * @param timestamp 时间
      */
-    public static void fireGiftSendEvent(final Integer room_id,final Integer userId, final Integer starId, final Integer toId,
-                                            final Integer gift_id, final Integer cost, final Integer count,  final Long timestamp) {
+    public static void fireGiftSendEvent(final Integer room_id, final Integer userId, final Integer starId, final Integer toId,
+                                         final Integer gift_id, final Integer cost, final Integer count, final Long timestamp) {
         for (final GiftSendListener awardListener : listenerList) {
             CoreExecutor.execute(new Runnable() {
                 public void run() {

@@ -42,7 +42,7 @@ public abstract class HttpClientUtils {
 
     static final Logger log = LoggerFactory.getLogger(HttpClientUtils.class);
 
-    public static final Charset UTF8 =Charset.forName("UTF-8");
+    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     public static final Charset GB18030 =  Charset.forName("GB18030");
 
@@ -100,29 +100,29 @@ public abstract class HttpClientUtils {
     }
 
 
-    public static String get(String url,Map<String,String> HEADERS)throws IOException {
+    public static String get(String url, Map<String,String> HEADERS)throws IOException {
         HttpGet get = new HttpGet(url);
         return execute(get,HEADERS,null);
     }
 
 
-    public static String get(String url,Map<String,String> HEADERS,Charset forceCharset)throws IOException{
+    public static String get(String url, Map<String,String> HEADERS, Charset forceCharset)throws IOException {
         HttpGet get = new HttpGet(url);
         return execute(get,HEADERS,forceCharset);
     }
 
-    public static String get(String url,Map<String,String> HEADERS,Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException{
+    public static String get(String url, Map<String,String> HEADERS, Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException {
         HttpGet get = new HttpGet(url);
         return execute(get,HEADERS,forceCharset,httpEntityHandler);
     }
 
-    public static String post(String url,Map<String,String> params,Map<String,String> headers) throws IOException{
+    public static String post(String url, Map<String,String> params, Map<String,String> headers) throws IOException {
         HttpPost post = new HttpPost(url);
         post.setEntity(new UrlEncodedFormEntity(buildParams(params), UTF8.name()));
         return execute(post,headers,null);
     }
 
-    public static String postJson(String url, String body) throws IOException{
+    public static String postJson(String url, String body) throws IOException {
         Map<String, String> headers = new HashMap<>();
         return postJson(url, body, headers);
     }
@@ -131,7 +131,7 @@ public abstract class HttpClientUtils {
         return postJson(url, body, headers, null);
     }
 
-    public static String post(String url,Map<String,String> params,Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException{
+    public static String post(String url, Map<String,String> params, Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException {
         HttpPost post = new HttpPost(url);
         post.setEntity(new UrlEncodedFormEntity(buildParams(params), UTF8.name()));
         return execute(post,headers,null, httpEntityHandler);
@@ -144,11 +144,11 @@ public abstract class HttpClientUtils {
         return execute(post, headers, null, httpEntityHandler);
     }
 
-    public static String put(String url,Map<String,String> params,Map<String,String> headers) throws IOException{
+    public static String put(String url, Map<String,String> params, Map<String,String> headers) throws IOException {
         return put(url, params, headers, null);
     }
 
-    public static String put(String url,Map<String,String> params,Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException{
+    public static String put(String url, Map<String,String> params, Map<String,String> headers, HttpEntityHandler<String> httpEntityHandler) throws IOException {
         HttpPut put = new HttpPut(url);
         put.setEntity(new UrlEncodedFormEntity(buildParams(params), UTF8.name()));
         return execute(put,headers,null, httpEntityHandler);
@@ -165,7 +165,7 @@ public abstract class HttpClientUtils {
         return ps;
     }
 
-    public static <T> T  http(HttpClient  client,HttpRequestBase request,Map<String,String> headers,HttpEntityHandler<T> handler)
+    public static <T> T  http(HttpClient  client, HttpRequestBase request, Map<String,String> headers, HttpEntityHandler<T> handler)
             throws IOException {
         if(headers !=null &&  ! headers.isEmpty()){
             for (Map.Entry<String,String> kv : headers.entrySet()){
@@ -195,21 +195,21 @@ public abstract class HttpClientUtils {
             // CLOST_WAIT 僵死连接数 （占用一个路由的连接）
             //EntityUtils.consumeQuietly(entity);
             // 被动关闭连接 (目标服务器发生异常主动关闭了链接) 之后自己并没有释放连接，那就会造成CLOSE_WAIT的状态
-            log.info(handler.getName() + "  {},cost {} ms",request.getURI(),System.currentTimeMillis() - begin);
+            log.info(handler.getName() + "  {},cost {} ms",request.getURI(), System.currentTimeMillis() - begin);
         }
     }
 
 
-    private static String execute(final HttpRequestBase request,Map<String,String> headers,final Charset forceCharset)throws IOException{
+    private static String execute(final HttpRequestBase request, Map<String,String> headers, final Charset forceCharset)throws IOException {
         return execute(request,headers,forceCharset, null);
     }
 
-    private static String execute(final HttpRequestBase request,Map<String,String> headers,final Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException {
+    private static String execute(final HttpRequestBase request, Map<String,String> headers, final Charset forceCharset, HttpEntityHandler<String> httpEntityHandler)throws IOException {
         return http(HTTP_CLIENT,request,headers,httpEntityHandler != null ? httpEntityHandler : new StringHttpEntityHandler(request.getMethod(), forceCharset));
     }
 
 
-    private static Charset checkMetaCharset(String html,Charset use){
+    private static Charset checkMetaCharset(String html, Charset use){
         String magic ="charset=";
         int index = html.indexOf(magic);
         if(index >0 && index < 1000){
@@ -251,7 +251,7 @@ public abstract class HttpClientUtils {
         }
 
         @Override
-        public String handle(HttpEntity entity) throws IOException{
+        public String handle(HttpEntity entity) throws IOException {
             if (entity == null) {
                 return null;
             }
@@ -286,7 +286,7 @@ public abstract class HttpClientUtils {
 
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
 
         Map map = new HashMap();

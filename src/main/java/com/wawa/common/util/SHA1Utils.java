@@ -274,7 +274,7 @@ public class SHA1Utils {
      * @param data
      * @return
      */
-    public String Digest(String data,String encode){
+    public String Digest(String data, String encode){
         try {
             return this.getDigestOfString(data.getBytes(encode));
         } catch (UnsupportedEncodingException e) {

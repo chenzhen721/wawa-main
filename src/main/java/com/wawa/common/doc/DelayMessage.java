@@ -7,6 +7,7 @@ import groovy.lang.Closure;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ *
  */
 public abstract class DelayMessage {
 
