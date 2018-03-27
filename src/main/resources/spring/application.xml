@@ -19,40 +19,6 @@
     <context:property-placeholder  location="classpath*:*.properties" ignore-unresolvable="true" />
     <util:properties id="application" location="classpath:application.properties" />
 
-    <bean id="machine" class="com.wawa.socket.MachineSocketServer"/>
-    <bean id="doll" class="com.wawa.socket.DollSocketServer"/>
-    <bean id="video" class="com.wawa.socket.VideoSocketServer"/>
-    <bean id="handshakeHandler" class="org.springframework.web.socket.server.support.DefaultHandshakeHandler"/>
-
-    <websocket:handlers allowed-origins="*">
-        <websocket:mapping path="/machine" handler="machine"/>
-        <websocket:handshake-handler ref="handshakeHandler"/>
-        <websocket:handshake-interceptors>
-            <bean class="com.wawa.socket.MachineHandshakeInterceptor"/>
-        </websocket:handshake-interceptors>
-    </websocket:handlers>
-    <websocket:handlers allowed-origins="*">
-        <websocket:mapping path="/doll" handler="doll"/>
-        <websocket:handshake-handler ref="handshakeHandler"/>
-        <websocket:handshake-interceptors>
-            <bean class="com.wawa.socket.DollHandshakeInterceptor"/>
-        </websocket:handshake-interceptors>
-    </websocket:handlers>
-    <websocket:handlers allowed-origins="*">
-        <websocket:mapping path="/push" handler="video"/>
-        <websocket:handshake-handler ref="handshakeHandler"/>
-        <websocket:handshake-interceptors>
-            <bean class="com.wawa.socket.VideoHandshakeInterceptor"/>
-        </websocket:handshake-interceptors>
-    </websocket:handlers>
-    <websocket:handlers allowed-origins="*">
-        <websocket:mapping path="/pull" handler="video"/>
-        <websocket:handshake-handler ref="handshakeHandler"/>
-        <websocket:handshake-interceptors>
-            <bean class="com.wawa.socket.VideoHandshakeInterceptor"/>
-        </websocket:handshake-interceptors>
-    </websocket:handlers>
-
     <!--<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"-->
           <!--p:configLocation="classpath:ehcache.xml"/>-->
     <!--<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cacheManager-ref="ehcache"/>-->

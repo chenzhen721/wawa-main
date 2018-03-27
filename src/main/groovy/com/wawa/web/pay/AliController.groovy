@@ -1,7 +1,7 @@
 package com.wawa.web.pay
 
-import com.alipay.api.internal.util.AlipaySignature
-import com.alipay.api.response.AlipayTradeWapPayResponse
+//import com.alipay.api.internal.util.AlipaySignature
+//import com.alipay.api.response.AlipayTradeWapPayResponse
 import com.mongodb.DBCollection
 import com.wawa.api.trade.Order
 import com.wawa.base.BaseController
@@ -73,10 +73,10 @@ class AliController extends BaseController {
         String out_trade_no = payController.createOrder(userId, toId)+"_${itemId}".toString()
         def privateField = [count: item['count'], award: item['award'] ?: 0, item_id: itemId, ext: ext]
         Order.prepayOrder(out_trade_no, OrderVia.支付宝WAP, privateField)
-        AlipayTradeWapPayResponse ali_resp = wapTrade2.pay(subject, out_trade_no, total_fee, return_url)
-        resp.setContentType("text/html; charset=utf-8")
-        resp.getWriter().write(ali_resp.body)
-        resp.getWriter().flush()
+//todo        AlipayTradeWapPayResponse ali_resp = wapTrade2.pay(subject, out_trade_no, total_fee, return_url)
+//        resp.setContentType("text/html; charset=utf-8")
+//        resp.getWriter().write(ali_resp.body)
+//        resp.getWriter().flush()
     }
 
     //支付宝回调
@@ -108,28 +108,28 @@ class AliController extends BaseController {
         String total_amount = new String(req.getParameter("total_amount").getBytes("ISO-8859-1"), "UTF-8");
 
         //计算得出通知验证结果
-        boolean verify_result = AlipaySignature.rsaCheckV1(params, AlipayConfig.ALIPAY_PUBLIC_KEY, AlipayConfig.CHARSET, AlipayConfig.SIGNTYPE)
+//        boolean verify_result = AlipaySignature.rsaCheckV1(params, AlipayConfig.ALIPAY_PUBLIC_KEY, AlipayConfig.CHARSET, AlipayConfig.SIGNTYPE)
         def out = resp.getWriter()
-        if (verify_result) {//验证成功
-            if (trade_status == TRADE_FINISHED || trade_status == TRADE_SUCCESS) {
-                // 通过商品ID获取返币
-                logger.debug("TRADE_FINISHED : order_id {}", out_trade_no)
-                def record = Order.getOrderById(out_trade_no)
-                def attach = record?.get('ext') ?: [:]
-                Long diamond = attach['count'] as Long ?: 0
-                Long award = attach['award'] as Long ?: 0
-                Integer itemId = attach['item_id'] as Integer ?: null
-                String exten = attach['ext'] as String ?: ''
-
-                def ext = [award: award, item_id: itemId, ext: exten]
-                if (payController.addDiamond(out_trade_no, Double.parseDouble(total_amount), diamond, OrderVia.支付宝WAP.id, trade_no, 'CNY', '', ext)) {
-                    out.print("success")
-                    return
-                }
-            }
-        } else {//验证失败
-            out.print("fail")
-        }
+//        if (verify_result) {//验证成功
+//            if (trade_status == TRADE_FINISHED || trade_status == TRADE_SUCCESS) {
+//                // 通过商品ID获取返币
+//                logger.debug("TRADE_FINISHED : order_id {}", out_trade_no)
+//                def record = Order.getOrderById(out_trade_no)
+//                def attach = record?.get('ext') ?: [:]
+//                Long diamond = attach['count'] as Long ?: 0
+//                Long award = attach['award'] as Long ?: 0
+//                Integer itemId = attach['item_id'] as Integer ?: null
+//                String exten = attach['ext'] as String ?: ''
+//
+//                def ext = [award: award, item_id: itemId, ext: exten]
+//                if (payController.addDiamond(out_trade_no, Double.parseDouble(total_amount), diamond, OrderVia.支付宝WAP.id, trade_no, 'CNY', '', ext)) {
+//                    out.print("success")
+//                    return
+//                }
+//            }
+//        } else {//验证失败
+//            out.print("fail")
+//        }
         out.print("success")
     }
 

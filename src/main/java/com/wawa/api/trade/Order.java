@@ -94,9 +94,9 @@ public abstract class Order {
         orderProcessList.put(OrderVia.微信H5.getId(), new WeiXinOrderProcess());
         orderProcessList.put(OrderVia.微信WAP.getId(), new WeiXinOrderProcess());
         orderProcessList.put(OrderVia.微信手机.getId(), new WeiXinOrderProcess());
-        orderProcessList.put(OrderVia.支付宝WAP.getId(), new AliPayOrderProcess());
+        /*orderProcessList.put(OrderVia.支付宝WAP.getId(), new AliPayOrderProcess());
         orderProcessList.put(OrderVia.支付宝手机.getId(), new AliPayOrderProcess());
-        orderProcessList.put(OrderVia.支付宝PC.getId(), new AliPayOrderProcess());
+        orderProcessList.put(OrderVia.支付宝PC.getId(), new AliPayOrderProcess());*/
     }
 
     public static DelayOrdeInfo findDelayOrder(String order_id, String via){

@@ -1,9 +1,9 @@
 package com.wawa.api.trade;
 
-import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.request.AlipayTradeQueryRequest;
-import com.alipay.api.response.AlipayTradeQueryResponse;
+//import com.alipay.api.AlipayClient;
+//import com.alipay.api.DefaultAlipayClient;
+//import com.alipay.api.request.AlipayTradeQueryRequest;
+//import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.wawa.service.alipay.config.AlipayConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class AliOrderQuery {
 
     public static Map<String, String> query(String out_trade_no) {
         Map<String,String> resMap = new HashMap<>();
-       try{
+       /*try{
            AlipayClient alipayClient = new DefaultAlipayClient(API_URL, AlipayConfig.APPID,AlipayConfig.RSA_PRIVATE_KEY,AlipayConfig.FORMAT,
                                                                     AlipayConfig.CHARSET,AlipayConfig.ALIPAY_PUBLIC_KEY,AlipayConfig.SIGNTYPE);
            AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
@@ -37,7 +37,7 @@ public class AliOrderQuery {
            }
         }catch (Exception e){
             logger.error("query Exception : {}", e);
-        }
+        }*/
         return resMap;
     }
 

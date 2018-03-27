@@ -327,7 +327,7 @@
         <profile>
             <id>testLocal</id>
             <properties>
-                <redis.host>172.18.78.183</redis.host>
+                <redis.host>127.0.0.1</redis.host>
                 <mongo.uri>127.0.0.1:27017</mongo.uri>
                 <mongo.cost.write>ACKNOWLEDGED</mongo.cost.write>
                 <redis.mem.host>${redis.host}</redis.mem.host>
@@ -639,11 +639,11 @@
             <version>2.9.0</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.alipay.api</groupId>
             <artifactId>alipay-sdk-java</artifactId>
             <version>20170615110526</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
