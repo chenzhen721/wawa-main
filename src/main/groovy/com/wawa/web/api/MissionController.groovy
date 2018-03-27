@@ -2,6 +2,7 @@ package com.wawa.web.api
 
 import com.mongodb.BasicDBObject
 import com.mongodb.DBCollection
+import com.mongodb.DBObject
 import com.wawa.api.Web
 import com.wawa.base.anno.RestWithSession
 import com.wawa.common.doc.Result
@@ -218,7 +219,7 @@ class MissionController extends BaseController {
         def total = 0
         def detail = []
         def used_ids = []
-        logs.each { BasicDBObject obj->
+        logs.each { DBObject obj->
             def is_award = obj['is_award'] as Boolean
             def diamond = obj['award'] as Integer ?: 0
             if (!is_award) {
@@ -256,7 +257,7 @@ class MissionController extends BaseController {
             def next_logs = sign_logs().find($$(user_id: userId, timestamp: [$gte: next_start, $lt: next_end])).toArray()
             def next_ids = []
             def next_count = 0
-            next_logs.each { BasicDBObject obj ->
+            next_logs.each { DBObject obj ->
                 def diamond = obj['award'] as Integer ?: 0
                 next_count = next_count + diamond
                 def preUsed = obj['is_pre_used'] as Boolean
@@ -321,7 +322,10 @@ class MissionController extends BaseController {
         }
         def query = $$(invitor: invitor, beyond_toplimit: false, is_used: false, timestamp: [$gte: new Date().clearTime().getTime()])
         def invitorLogs = invitor_logs().find(query).toArray()
-        def ids = invitorLogs*._id
+        def ids = []
+        invitorLogs.each { DBObject obj ->
+            ids.add(obj.get('_id') as Integer)
+        }
         if (invitor_logs().update($$(_id: [$in: ids]), $$($set: [is_used: true]), false, true).getN() <= 0) {
             return [code: 1]
         }
@@ -339,7 +343,7 @@ class MissionController extends BaseController {
         def details = []
         def diamond = 0
         award_notify_logs().find($$(type: Mission.注册奖励.id, user_id: userId, is_used: false,
-                timestamp: [$lt: System.currentTimeMillis()])).toArray().each{ BasicDBObject obj->
+                timestamp: [$lt: System.currentTimeMillis()])).toArray().each{ DBObject obj->
             def award = obj['award']
             ids.add(obj['_id'])
             if (award != null && award['diamond'] != null) {

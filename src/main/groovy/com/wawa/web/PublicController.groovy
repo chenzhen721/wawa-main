@@ -564,7 +564,11 @@ class PublicController extends BaseController {
 
     //获得房间id
     private List<Integer> getRoomIdsByQuery(DBObject room_query) {
-        return rooms().find(room_query, $$(_id: 1)).limit(20).toArray()*._id
+        def ids = []
+        rooms().find(room_query, $$(_id: 1)).limit(20).toArray().each {DBObject obj ->
+            ids.add(obj.get('_id') as Integer)
+        }
+        return ids
     }
 
     private getRoomList(HttpServletRequest req, BasicDBObject desc, DBObject room_query) {

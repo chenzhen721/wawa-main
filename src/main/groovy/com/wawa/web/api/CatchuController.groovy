@@ -2,6 +2,7 @@ package com.wawa.web.api
 
 import com.mongodb.BasicDBObject
 import com.mongodb.DBCollection
+import com.mongodb.DBObject
 import com.wawa.api.Web
 import com.wawa.base.anno.RestWithSession
 import com.wawa.common.doc.TwoTableCommit
@@ -563,7 +564,7 @@ class CatchuController extends BaseController {
             return Result.error
         }
         def query = $$(timestamp: [$gte: stime.getTime(), $lt: etime.getTime()], is_award: [$ne: true], post_type: CatchPostType.未处理.ordinal(), is_delete: [$ne: true])
-        catch_success_logs().find(query).toArray().each { BasicDBObject obj ->
+        catch_success_logs().find(query).toArray().each { DBObject obj ->
             exchange(obj)
         }
         return Result.success
@@ -605,7 +606,7 @@ class CatchuController extends BaseController {
         def query = $$(_id: [$in: logIds], is_award: [$ne: true], post_type: CatchPostType.未处理.ordinal(), is_delete: [$ne: true])
         def succ = []
         def fail = []
-        catch_success_logs().find(query).toArray().each { BasicDBObject obj ->
+        catch_success_logs().find(query).toArray().each { DBObject obj ->
             if (exchange(obj)) {
                 succ.add(obj['_id'])
             } else {
@@ -615,7 +616,7 @@ class CatchuController extends BaseController {
         return [code: 1, data: [success: succ, fail: fail]]
     }
 
-    private boolean exchange(BasicDBObject obj) {
+    private boolean exchange(DBObject obj) {
         def user_id = obj['user_id'] as Integer
         def coin = obj['coin'] as Integer
         //获取补单的娃娃积分
@@ -738,7 +739,7 @@ class CatchuController extends BaseController {
         }
         def ids = []
         def n = 0
-        logs.each { BasicDBObject obj ->
+        logs.each { DBObject obj ->
             if (!isTest || (isTest && n < 1)) {
                 ids.add(obj['_id'])
             }

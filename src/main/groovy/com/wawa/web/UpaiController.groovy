@@ -54,9 +54,9 @@ class UpaiController extends BaseController{
 
     def notify(HttpServletRequest req){
 //        def code = req['code'] // 200
-        def message = req['message']
-        def url = req['url']
-        def time = req['time']
+        def message = req['message'] as String
+        def url = req['url'] as String
+        def time = req['time'] as String
 //        def image_width = req['image-width']
 //        def image_height = req['image­height']
 //        def image_type = req['image­type']
@@ -99,7 +99,7 @@ class UpaiController extends BaseController{
     private static final Integer NOT_ALLOWD = Integer.valueOf(1)
     @Deprecated
     def audit(HttpServletRequest req){
-        def json = req['json']
+        def json = req['json'] as String
         def i = 0
         if(MsgDigestUtil.MD5.digest2HEX("${json}${audit_key}").equals(req['sign'])){
             def list = JSONUtil.jsonToBean(json,ArrayList.class)

@@ -2,6 +2,7 @@ package com.wawa.web.api
 
 import com.mongodb.BasicDBObject
 import com.mongodb.DBCollection
+import com.mongodb.DBObject
 import com.wawa.base.anno.RestWithSession
 import com.wawa.base.Crud
 import com.wawa.common.doc.Result
@@ -174,7 +175,7 @@ class RedPacketController extends BaseController {
      * @param req
      */
     def refund(HttpServletRequest req) {
-        red_packets().find($$(category: 2, count: [$gt: 0], end_at: [$lt: System.currentTimeMillis()])).toArray().each { BasicDBObject obj->
+        red_packets().find($$(category: 2, count: [$gt: 0], end_at: [$lt: System.currentTimeMillis()])).toArray().each { DBObject obj->
             def refund = (obj['packets'] as List).sum()
             //更改红包状态，
             def set = $$(status: RedPacketStatus.超时.ordinal(), refund: refund)

@@ -227,7 +227,7 @@ class JavaController extends BaseController{
 
 
     def test (){
-        DelayQueueRedis testQueue = new DelayQueueRedis("test");
+        DelayQueueRedis testQueue = DelayQueueRedis.generateQueue("test");
         testQueue.offer(new DelayQueueRedis.Task(UUID.randomUUID().toString(), 10*1000, 10*1000+"后执行"));
         testQueue.addListner(new DelayQueueRedis.DelayQueueJobListener(){
             public void doJob(DelayQueueRedis.Task task){

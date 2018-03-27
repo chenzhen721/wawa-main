@@ -42,7 +42,7 @@ class WeixinJSController extends BaseController{
      * @return
      */
     def auth(HttpServletRequest req){
-        def url = req['url']
+        def url = req['url'] as String
         if(StringUtils.isEmpty(url)){
             return Result.丢失必需参数;
         }
@@ -232,6 +232,6 @@ class WeixinJSController extends BaseController{
     }
 
     private static String create_timestamp() {
-        return Long.toString(System.currentTimeMillis() / 1000);
+        return '' + (System.currentTimeMillis() / 1000).longValue()
     }
 }

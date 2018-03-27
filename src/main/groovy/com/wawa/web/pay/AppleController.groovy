@@ -209,11 +209,11 @@ class AppleController extends BaseController {
     //注册（idfa）
     def idfa(HttpServletRequest req) {
         logger.debug('Recv idfa params: {}',req.getParameterMap())
-        def idfa = req['idfa']
-        def call_back = req['call_back']
+        def idfa = req['idfa'] as String
+        def call_back = req['call_back'] as String
         def from = req['from']
         def user_id = Web.getCurrentUserId()
-        if (StringUtils.isEmpty(idfa) || StringUtils.isEmpty(req['s']))
+        if (StringUtils.isEmpty(idfa) || StringUtils.isEmpty(req['s'] as String))
             return Result.丢失必需参数;
         //验证签名
         String sign = MsgDigestUtil.MD5.digest2HEX("${idfa}${user_id}${KEY}", true)

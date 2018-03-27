@@ -20,9 +20,8 @@ public class HttpUtils {
 	/**
 	 * 通过HTTP GET 发送参数
 	 * 
-	 * @param httpUrl
-	 * @param parameter
-	 * @param httpMethod
+	 * @param httpUrl 地址
+	 * @param parameter 参数
 	 */
 	public static String sendGet(String httpUrl, Map<String, String> parameter) {
 		if (parameter == null || httpUrl == null) {

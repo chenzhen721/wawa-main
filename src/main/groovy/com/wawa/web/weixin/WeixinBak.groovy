@@ -534,7 +534,7 @@ class WeixinBak extends BaseController {
      * 我写这段代码的时候心里想疯
      * @return
      */
-    static initErrorCode() {
+    static Map initErrorCode() {
         Map map = new HashMap()
         map.put(-1, '系统繁忙，此时请开发者稍候再试')
         map.put(0, '请求成功')

@@ -387,7 +387,7 @@ class QiyiguoPublicController extends BaseController {
         if (data['code'] != 1 || data['data'] == null) {
             return [list: [], offline: []]
         }
-        def list = data['data'] as List
+        def list = data['data'] as List<Map>
         def rids = []
         list.each { Map map-> rids.add(map['room_id'] as Integer) }
         def map = getStatusByRoomIds(rids)

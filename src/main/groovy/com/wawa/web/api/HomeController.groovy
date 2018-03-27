@@ -76,7 +76,7 @@ class HomeController extends BaseController {
     def index_event(HttpServletRequest req) {
         def result = [:] as Map
         //查询申述通知
-        def logs = catchuController.record_observ_notify(Web.getCurrentUserId) as List
+        def logs = catchuController.record_observ_notify(Web.getCurrentUserId()) as List
         if (logs == null) {
             logs = [] as List
         }
