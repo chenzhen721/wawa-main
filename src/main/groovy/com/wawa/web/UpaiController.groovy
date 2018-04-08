@@ -53,16 +53,11 @@ class UpaiController extends BaseController{
 //    }
 
     def notify(HttpServletRequest req){
-//        def code = req['code'] // 200
-        def message = req['message'] as String
-        def url = req['url'] as String
-        def time = req['time'] as String
-//        def image_width = req['image-width']
-//        def image_height = req['image­height']
-//        def image_type = req['image­type']
-//        def image_frames = req['image-frames']
-//        logger.debug("map:${req.getParameterMap()}" )
-        if(MsgDigestUtil.MD5.digest2HEX("200&${message}&${url}&${time}&${HTTP_FORM_KEY}").equals(req['sign'])){
+//        def code = req.getParameter('code') // 200
+        def message = req.getParameter('message') as String
+        def url = req.getParameter('url') as String
+        def time = req.getParameter('time') as String
+        if(MsgDigestUtil.MD5.digest2HEX("200&${message}&${url}&${time}&${HTTP_FORM_KEY}").equals(req.getParameter('sign'))){
             logger.debug("sign PASS")
             def notifys = logMongo.getCollection(UPAI_NOTIFY_COLLECTION)
             def obj = new BasicDBObject(_id,url)
@@ -99,9 +94,9 @@ class UpaiController extends BaseController{
     private static final Integer NOT_ALLOWD = Integer.valueOf(1)
     @Deprecated
     def audit(HttpServletRequest req){
-        def json = req['json'] as String
+        def json = req.getParameter('json') as String
         def i = 0
-        if(MsgDigestUtil.MD5.digest2HEX("${json}${audit_key}").equals(req['sign'])){
+        if(MsgDigestUtil.MD5.digest2HEX("${json}${audit_key}").equals(req.getParameter('sign'))){
             def list = JSONUtil.jsonToBean(json,ArrayList.class)
             def photos = photos()
             def ban_photos = mainMongo.getCollection("ban_photos")

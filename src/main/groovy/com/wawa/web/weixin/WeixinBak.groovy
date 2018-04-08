@@ -70,8 +70,8 @@ class WeixinBak extends BaseController {
     def event_callback(HttpServletRequest req, HttpServletResponse resp) {
         RETRY = 0
         logger.debug("Recv event_callback params : {}", req.getParameterMap())
-        String appId = req['app_id']
-        String defaultUnion = req['default_union']
+        String appId = req.getParameter('app_id')
+        String defaultUnion = req.getParameter('default_union')
         String appSecret = getAppSecret(appId)
         Boolean flag = this.validationReferer(req, resp)
         if (!flag || appSecret == '') {
@@ -122,8 +122,8 @@ class WeixinBak extends BaseController {
     def qrcode(HttpServletRequest req) {
         RETRY = 0
         logger.debug("Recv qrcode params : {}", req.getParameterMap())
-        String sceneId = req['sence_id']
-        String appId = req['app_id']
+        String sceneId = req.getParameter('sence_id')
+        String appId = req.getParameter('app_id')
         String appSecret = getAppSecret(appId)
         if (appSecret == '') {
             logger.debug('app secret is not found in DB')
@@ -301,7 +301,7 @@ class WeixinBak extends BaseController {
      * 刷新token
      */
     def refreshAccessToken(HttpServletRequest req){
-        String appId = req['app_id']
+        String appId = req.getParameter('app_id')
         String appSecret = getAppSecret(appId)
         String key = 'weixin:' + appId + ':token'
         mainRedis.delete(key)
@@ -314,10 +314,10 @@ class WeixinBak extends BaseController {
      */
     private boolean validationReferer(HttpServletRequest req, HttpServletResponse resp) {
         Boolean flag = true;
-        String signature = req['signature']
-        String timestamp = req['timestamp']
-        String nonce = req['nonce']
-        String echostr = req['echostr']
+        String signature = req.getParameter('signature')
+        String timestamp = req.getParameter('timestamp')
+        String nonce = req.getParameter('nonce')
+        String echostr = req.getParameter('echostr')
 
         List<String> checkList = new ArrayList<String>()
         checkList.add(nonce)
@@ -392,10 +392,10 @@ class WeixinBak extends BaseController {
     def create_menu(HttpServletRequest req) {
         RETRY = 0
         logger.debug("Recv create_menu params : {}", req.getParameterMap())
-        String url = req['url']
-        String type = req['type']
-        String name = req['name']
-        String appId = req['app_id']
+        String url = req.getParameter('url')
+        String type = req.getParameter('type')
+        String name = req.getParameter('name')
+        String appId = req.getParameter('app_id')
         String appSecret = getAppSecret(appId)
         url = URLDecoder.decode(url, "utf-8");
 
@@ -427,7 +427,7 @@ class WeixinBak extends BaseController {
         RETRY = 0
         logger.debug("Recv delete_menu params : {}", req.getParameterMap())
 
-        String appId = req['app_id']
+        String appId = req.getParameter('app_id')
         String appSecret = getAppSecret(appId)
         String requestUrl = WEIXIN_URL + 'menu/delete?access_token='.concat(getAccessToken(appId, appSecret))
         Map respMap = this.postWX('GET', requestUrl, new HashMap(), appId, appSecret)
@@ -450,7 +450,7 @@ class WeixinBak extends BaseController {
         RETRY = 0
         logger.debug("Recv search_menu params : {}", req.getParameterMap())
 
-        String appId = req['app_id']
+        String appId = req.getParameter('app_id')
         String appSecret = getAppSecret(appId)
         String requestUrl = WEIXIN_URL + 'menu/get?access_token='.concat(getAccessToken(appId, appSecret))
         Map respMap = this.postWX('GET', requestUrl, new HashMap(), appId, appSecret)
@@ -473,8 +473,8 @@ class WeixinBak extends BaseController {
      */
     def redirect(HttpServletRequest req, HttpServletResponse response) {
         logger.debug("Recv redirect params: {}", req.getParameterMap())
-        String code = req['code']
-        String appid = req['appid']
+        String code = req.getParameter('code')
+        String appid = req.getParameter('appid')
 
         String appSecret = getAppSecret(appid)
         logger.debug("appid :{}, appSecret:{}", appid, appSecret)

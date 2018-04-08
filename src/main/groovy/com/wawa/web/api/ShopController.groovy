@@ -80,7 +80,7 @@ class ShopController extends BaseController {
      * @apiError UserNotFound The <code>0</code> of the User was not found.
      */
     def list(HttpServletRequest req) {
-        def group = req['group'] as String
+        def group = req.getParameter('group') as String
         def query = $$(status: true, stime: [$lte: System.currentTimeMillis()])
         if (StringUtils.isNotBlank(group)) {
             query.put('group', group)

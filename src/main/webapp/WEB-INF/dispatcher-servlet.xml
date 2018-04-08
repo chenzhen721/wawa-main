@@ -13,7 +13,7 @@
 
     <context:property-placeholder location="classpath:application.properties" ignore-unresolvable="true"/>
 
-    <context:component-scan base-package="com.wawa.web, com.wawa.socket"/>
+    <context:component-scan base-package="com.wawa.web"/>
 
     <mvc:annotation-driven/>
     <mvc:resources  location="/static/" mapping="/MP_*.txt"/>
@@ -22,10 +22,5 @@
     <bean class="com.wawa.base.spring.InterceptorAnnotationAwareClassNameHandlerMapping" />
     <bean id="sessionInterceptor" class="com.wawa.api.interceptor.OAuth2SimpleInterceptor"
             p:mainMongo-ref="mainMongo" p:mainRedis-ref="mainRedis"   p:chatRedis-ref="chatRedis"  p:userKGS-ref="userKGS"/>
-
-
-
-
-
 
 </beans>

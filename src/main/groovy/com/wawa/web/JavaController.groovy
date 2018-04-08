@@ -108,7 +108,7 @@ class JavaController extends BaseController{
      * @param req
      */
     def push_user_validate(HttpServletRequest req){
-        Integer userId = req['user_id'] as Integer
+        Integer userId = req.getParameter('user_id') as Integer
         if(isTest){
             //publish(KeyUtils.CHANNEL.user(userId), [action: "user.live_check", data_d: [id:userId,'t':System.currentTimeMillis(), msg:'hello', geetest:Boolean.TRUE]])
         }
@@ -190,7 +190,7 @@ class JavaController extends BaseController{
     }
 
     def md5(HttpServletRequest req){
-        [code :1, data:[md5:MsgDigestUtil.MD5.digest2HEX(req['data'] as String ?: '')]]
+        [code :1, data:[md5:MsgDigestUtil.MD5.digest2HEX(req.getParameter('data') as String ?: '')]]
     }
 
     /**
@@ -199,7 +199,7 @@ class JavaController extends BaseController{
      */
     def add_msg_to_robot(HttpServletRequest req){
         String key = 'chat:msg:list'
-        String msgs = req['msgs']
+        String msgs = req.getParameter('msgs')
         if(StringUtils.isNotBlank(msgs)){
             String[] msgList = msgs.trim().replace('，',',',).split(',')
             if(msgList != null || msgList.length > 0) {
@@ -217,7 +217,7 @@ class JavaController extends BaseController{
      */
     def del_msg_to_robot(HttpServletRequest req){
         String key = 'chat:msg:list'
-        String msg = req['msg']
+        String msg = req.getParameter('msg')
         if(StringUtils.isNotBlank(msg)){
             userRedis.opsForSet().remove(key, msg)
         }

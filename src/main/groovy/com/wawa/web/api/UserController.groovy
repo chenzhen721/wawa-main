@@ -66,8 +66,8 @@ class UserController extends BaseController {
     @Resource
     MongoTemplate adminMongo
 
-    @Resource
-    FriendController friendController
+    /*@Resource
+    FriendController friendController*/
 
     @Resource
     MissionController missionController
@@ -125,7 +125,7 @@ class UserController extends BaseController {
                 def robot_ids = Web.getRoBotIdList();
                 (RandomUtils.nextInt(FRIEND_SIZE) as Integer).each {
                     Integer robotId = robot_ids[RandomUtils.nextInt(robot_ids.size())]
-                    friendController.addApply(userId, robotId, 'Hi')
+                    //friendController.addApply(userId, robotId, 'Hi')
                     logger.debug("After Build User addApplyFriend robotId: {}", robotId);
                 }
             }
@@ -385,14 +385,10 @@ class UserController extends BaseController {
             logger.warn('user was disabled,userId is {}', userId)
             return [code: 30405, msg: "user was disabled"]
         }
-        if (Boolean.FALSE == (user.get('status') ?: Boolean.FALSE) as Boolean ) {
+        if (Boolean.TRUE != user.get('status')) {
             logout(req)
             return [code: 30418, msg: "user冻结", unfreeze_time: user?.get("unfreeze_time")]
         }
-        /*def qd = user.remove('qd')
-        if (req['qd'] != null && req['qd'] != qd && '1' == mainRedis.opsForValue().get(KeyUtils.USER.first(userId))) {
-            users().update($$(_id: user['_id']), $$($set: [qd: req['qd']]), false, false, writeConcern)
-        }*/
         //Integer level = (user['level'] ?:0) as Integer
         //user['next_level_exp'] = Level.userLevelUpExp(level+1)
         def valueOp = mainRedis.opsForValue()
@@ -971,16 +967,13 @@ class UserController extends BaseController {
     def accuse(HttpServletRequest req) {
         Integer uid = Web.getCurrentUserId()
         Integer roomId = Web.firstNumber(req)
-        /* if(StringUtils.isEmpty(req['type']) || StringUtils.isEmpty(req['desc']) || req.getParameterValues("pics[]") == null){
-             return Result.丢失必需参数;
-         }*/
         if (roomId == null) {
             return Result.丢失必需参数
         }
         def type = ServletRequestUtils.getIntParameter(req, 'type', 1);
-        def desc = req['desc']
+        def desc = req.getParameter('desc')
         String[] pics = req.getParameterValues("pics[]") //上传至又拍云 保存地址
-        String snapshot = req["snapshot"] //自动截图flash 直接保存base64字符串
+        String snapshot = req.getParameter("snapshot") //自动截图flash 直接保存base64字符串
         def curr = System.currentTimeMillis()
         if (1 == users().update(
                 new BasicDBObject(_id: uid, 'finance.coin_count': [$gte: ACCUSE_COST]),
@@ -1024,8 +1017,8 @@ class UserController extends BaseController {
      * @return
      */
     def change_pwd(HttpServletRequest req) {
-        String oldpwd = req['oldpwd']
-        String newpwd = req['newpwd']
+        String oldpwd = req.getParameter('oldpwd')
+        String newpwd = req.getParameter('newpwd')
         String token = OAuth2SimpleInterceptor.parseToken(req)
         String token_key = KeyUtils.accessToken(token)
         Map result = UserWebApi.changePwd(token, oldpwd, newpwd)
@@ -1116,9 +1109,9 @@ class UserController extends BaseController {
      */
     def bind_mobile(HttpServletRequest req) {
         String token = OAuth2SimpleInterceptor.parseToken(req)
-        String mobile = req['mobile']
-        String sms_code = req['sms_code']
-        String pwd = req['pwd']
+        String mobile = req.getParameter('mobile')
+        String sms_code = req.getParameter('sms_code')
+        String pwd = req.getParameter('pwd')
         def user = users().findOne(Web.getCurrentUserId(), user_bind_info_field) as BasicDBObject
         if (user == null) {
             return Result.丢失必需参数
@@ -1157,9 +1150,9 @@ class UserController extends BaseController {
         if(null == user)
             return [code: 0]
 
-        def friend = [friend: false]
+        def friend = [friend: false] as Map
         if (uid != currentUid) {
-            friend = friendController.is_friend(req)['data'] as Map
+            //friend = friendController.is_friend(req)['data'] as Map
         }
         user.putAll(friend)
 
@@ -1510,7 +1503,7 @@ class UserController extends BaseController {
 
     def bind_open_id(HttpServletRequest req){
         logger.debug('Received bind open id params is {}',req.getParameterMap())
-        def openId = req['open_id']
+        def openId = req.getParameter('open_id')
         Integer userId = Web.getCurrentUserId()
         logger.debug('userId is {}',userId)
         def query = $$('_id':userId,'status':Boolean.TRUE)
@@ -1547,7 +1540,7 @@ class UserController extends BaseController {
      */
     def unbind_mobile(HttpServletRequest req) {
         final String token = OAuth2SimpleInterceptor.parseToken(req)
-        final String sms_code = req['sms_code']
+        final String sms_code = req.getParameter('sms_code')
         final Integer userId = Web.getCurrentUserId()
         def user = (BasicDBObject) users().findOne(userId, user_bind_info_field)
         if (null == user) {
@@ -1577,8 +1570,8 @@ class UserController extends BaseController {
      */
     def bind_userName(HttpServletRequest req) {
         String token = OAuth2SimpleInterceptor.parseToken(req)
-        String userName = req['userName']
-        String pwd = req['pwd']
+        String userName = req.getParameter('userName')
+        String pwd = req.getParameter('pwd')
         def user = (BasicDBObject) users().findOne(Web.getCurrentUserId(), user_bind_info_field)
         if (null == user) {
             return [code: 30405, msg: "user用户信息为Null"]
@@ -1618,8 +1611,8 @@ class UserController extends BaseController {
      */
     def bind_email(HttpServletRequest req) {
         String token = OAuth2SimpleInterceptor.parseToken(req)
-        String email = req['email']
-        String pwd = req['pwd']
+        String email = req.getParameter('email')
+        String pwd = req.getParameter('pwd')
         def user = (BasicDBObject) users().findOne(Web.getCurrentUserId(), user_bind_info_field)
         if (null == user) {
             return [code: 30405, msg: "user用户信息为Null"]

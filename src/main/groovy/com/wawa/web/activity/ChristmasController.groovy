@@ -11,6 +11,7 @@ import com.wawa.base.BaseController
 import com.wawa.api.Web
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.web.bind.ServletRequestUtils
 
 import javax.servlet.http.HttpServletRequest
 import java.text.SimpleDateFormat
@@ -157,8 +158,8 @@ class ChristmasController extends BaseController {
         }
 
         Integer userId = Web.getCurrentUserId()
-        def product_id = req["product_id"] as Integer
-        def remark = req['remark'] ?: ''
+        def product_id = req.getParameter("product_id") as Integer
+        def remark = ServletRequestUtils.getStringParameter(req, 'remark', '')
         List<Integer> dolls = DOLL_GROUPS[product_id] as List
         if(dolls == null) {
             return Result.丢失必需参数

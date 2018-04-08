@@ -194,7 +194,7 @@ class AppleController extends BaseController {
 
     //注册设备（iphone）
     def register(HttpServletRequest req) {
-        def deviceToken = req['device_token'] as String
+        def deviceToken = req.getParameter('device_token') as String
         if (StringUtils.isNotBlank(deviceToken) && deviceToken.length() > 20) {
             String uid = Web.currentUserId()
             mainRedis.opsForSet().add(KeyUtils.PUBLIC.appleUsers(), uid)
@@ -209,15 +209,15 @@ class AppleController extends BaseController {
     //注册（idfa）
     def idfa(HttpServletRequest req) {
         logger.debug('Recv idfa params: {}',req.getParameterMap())
-        def idfa = req['idfa'] as String
-        def call_back = req['call_back'] as String
-        def from = req['from']
+        def idfa = req.getParameter('idfa') as String
+        def call_back = req.getParameter('call_back') as String
+        def from = req.getParameter('from')
         def user_id = Web.getCurrentUserId()
-        if (StringUtils.isEmpty(idfa) || StringUtils.isEmpty(req['s'] as String))
+        if (StringUtils.isEmpty(idfa) || StringUtils.isEmpty(req.getParameter('s') as String))
             return Result.丢失必需参数;
         //验证签名
         String sign = MsgDigestUtil.MD5.digest2HEX("${idfa}${user_id}${KEY}", true)
-        if (!sign.equals(req['s'])) {
+        if (!sign.equals(req.getParameter('s'))) {
             return Result.丢失必需参数;
         }
 

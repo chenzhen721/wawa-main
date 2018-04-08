@@ -42,7 +42,7 @@ class WeixinJSController extends BaseController{
      * @return
      */
     def auth(HttpServletRequest req){
-        def url = req['url'] as String
+        def url = req.getParameter('url') as String
         if(StringUtils.isEmpty(url)){
             return Result.丢失必需参数;
         }

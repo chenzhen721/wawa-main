@@ -500,7 +500,7 @@ class PublicController extends BaseController {
          }
      */
     def search(HttpServletRequest req) {
-        String keyword = req['keyword']
+        String keyword = req.getParameter('keyword')
         if (StringUtils.isEmpty(keyword))
             return Result.丢失必需参数;
 
@@ -667,9 +667,9 @@ class PublicController extends BaseController {
      */
     def find_pwd(HttpServletRequest req) {
         logger.debug('Received find_pwd params is {}', req.getParameterMap())
-        String mobile = req['mobile']
-        String sms_code = req['sms_code']
-        String pwd = req['pwd']
+        String mobile = req.getParameter('mobile')
+        String sms_code = req.getParameter('sms_code')
+        String pwd = req.getParameter('pwd')
         Map result = UserWebApi.findPwd(mobile, sms_code, pwd)
         if (result == null)
             return [code: 0]

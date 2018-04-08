@@ -26,10 +26,10 @@ class StatisticController extends BaseController{
     private static final String KEY = "OSERNIUGLKGFMV/ITFOBXCXA1CXA6UQ6";
 
     def weixin_template(HttpServletRequest req,HttpServletResponse response){
-        def redirect_url = req["redirect_url"] as String
-        def event = req['event'] as String
-        def trace_id = req['trace_id'] as String
-        def uid = req['uid'] as Integer
+        def redirect_url = req.getParameter("redirect_url") as String
+        def event = req.getParameter('event') as String
+        def trace_id = req.getParameter('trace_id') as String
+        def uid = req.getParameter('uid') as Integer
         if(StringUtils.isEmpty(redirect_url)){
             return  Result.丢失必需参数
         }

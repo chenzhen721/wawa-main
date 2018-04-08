@@ -29,7 +29,7 @@ class QmcController extends BaseController{
 
     static final Logger logger = LoggerFactory.getLogger(QmcController.class)
 
-    static final String RAN_TOKEN_SEED = "#@#kx" + new Date().format("yMMdd") + "%xi>YY"
+    static final String RAN_TOKEN_SEED = "#@#kx${new Date().format("yMMdd")}}%xi>YY".toString()
     static final String NAMESPACE = ""
 //    static final String NAMESPACE = UserFrom.全民彩.namespace
     static final String USER_API = isTest ? "http://219.143.144.194:1024/lotserver/third/getInfoByToken" : "http://s.qmcai.com/lotserver/third/getInfoByToken"
@@ -62,7 +62,7 @@ class QmcController extends BaseController{
      *
      */
     def login(HttpServletRequest req) {
-        def token = req['token'] as String
+        def token = req.getParameter('token') as String
         if (token == null) {
             logger.error("Quanmingcai login invalid param:" + req.getParameterMap())
             return [code: 0]

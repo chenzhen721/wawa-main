@@ -47,7 +47,7 @@ class AliController extends BaseController {
 
     //生产订单
     def wap_pay(HttpServletRequest req, HttpServletResponse resp) {
-        Integer userId = req[_id] as Integer
+        Integer userId = ServletRequestUtils.getIntParameter(req, _id)
         if (userId == null || users().count($$('_id', userId)) <= 0) {
             return Result.丢失必需参数
         }
@@ -61,7 +61,7 @@ class AliController extends BaseController {
         if (!userId.equals(toId) && users().count($$('_id', toId)) <= 0) {
             return Result.丢失必需参数
         }
-        String return_url = URLDecoder.decode(req["return_url"] as String, "UTF-8")
+        String return_url = URLDecoder.decode(req.getParameter("return_url") as String, "UTF-8")
         //后台商品ID 支付宝回调无法返回
         Integer itemId = ServletRequestUtils.getIntParameter(req, "item_id")
         def item = shop().findOne(itemId)

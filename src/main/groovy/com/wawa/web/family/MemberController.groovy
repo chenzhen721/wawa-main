@@ -246,12 +246,12 @@ class MemberController extends BaseController {
         def query = Web.fillTimeBetween(req)
         query.and("family_id").is(family_id)
 
-        if (StringUtils.isNotBlank(req['user_id'] as String))
-            query.and("xy_user_id").is(Integer.parseInt(req['user_id'] as String))
+        if (StringUtils.isNotBlank(req.getParameter('user_id') as String))
+            query.and("xy_user_id").is(Integer.parseInt(req.getParameter('user_id') as String))
 
         def status = FamilyApplyStatus.未处理.ordinal()
-        if (StringUtils.isNotBlank(req['status'] as String))
-            status = Integer.parseInt(req['status'] as String)
+        if (StringUtils.isNotBlank(req.getParameter('status') as String))
+            status = Integer.parseInt(req.getParameter('status') as String)
         query.and("status").is(status)
 
         Crud.list(req, table(), query.get(), ALL_FIELD, SJ_DESC) { List<BasicDBObject> list ->

@@ -29,7 +29,7 @@ class ChannelController extends BaseController {
      */
     def prop(HttpServletRequest req) {
         logger.debug('Recv prop params {}', req.getParameterMap())
-        def prop = channels().findOne($$(_id, req[_id]), $$(properties: 1, qrcode_img: 1, isAutoDownload : 1))
+        def prop = channels().findOne($$(_id, req.getParameter(_id)), $$(properties: 1, qrcode_img: 1, isAutoDownload : 1))
         return [code: 1, data: prop]
     }
 }

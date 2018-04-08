@@ -7,6 +7,7 @@ import com.wawa.web.api.UserController
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.ZSetOperations
+import org.springframework.web.bind.ServletRequestUtils
 
 import javax.servlet.http.HttpServletRequest
 import java.text.SimpleDateFormat
@@ -34,7 +35,7 @@ class ActivityController extends BaseController {
     def rank(HttpServletRequest req){
         if(!isPeriod())
             return [code: 0, msg: "活动已经结束!"]
-        Integer size = req['size'] as Integer ?: 10
+        Integer size = ServletRequestUtils.getIntParameter(req, 'size', 10)
         def star_user_rank_key = "active:${ACTIVE_NAME}:user:rank".toString()
         List<DBObject> rank = getUserList(star_user_rank_key, size);
         [code: 1, data: rank]

@@ -36,19 +36,22 @@ import static com.wawa.common.doc.MongoKey.*
 class WxpayController extends BaseController {
     static final Logger logger = LoggerFactory.getLogger(WxpayController.class)
     /**
-     *商户平台
+     * 商户平台
      */
-    private static final String H5_MCH_ID = isTest ? "1497610262" :"1495650632"
-    private static final String H5_APP_KEY = isTest ? "fbf4fd31c00a82d5cbe5161c5e699a0e" : "fbf4fd32c00a82d5cbe5161c5e699a0e"//商户号秘钥
+    private static final String H5_MCH_ID = isTest ? "1497610262" : "1495650632"
+    private static
+    final String H5_APP_KEY = isTest ? "fbf4fd31c00a82d5cbe5161c5e699a0e" : "fbf4fd32c00a82d5cbe5161c5e699a0e"//商户号秘钥
 
-    private static final String H5_APP_ID = isTest ? "wx87f81569b7e4b5f6" :"wxf64f0972d4922815"
-    private static final String H5_APP_Secret = isTest ? "8421fd4781b1c29077c2e82e71ce3d2a" : "fbf4fd32c00a82d5cbe5161c5e699a0e" //公众号秘钥
+    private static final String H5_APP_ID = isTest ? "wx87f81569b7e4b5f6" : "wxf64f0972d4922815"
+    private static
+    final String H5_APP_Secret = isTest ? "8421fd4781b1c29077c2e82e71ce3d2a" : "fbf4fd32c00a82d5cbe5161c5e699a0e"
+    //公众号秘钥
 
     private static final String PROGRAM_APP_ID = "wxc209b408001d9c77"//小程序APPID
     private static final String PROGRAM_APP_Secret = "ac0308bc4b0c50ab7915d838b39f6739" //小程序秘钥
 
-    private static final String H5_APP_URL= "https://api.weixin.qq.com/sns/oauth2/access_token"
-    private static final String H5_NOTIFY_PC_URL = AppProperties.get('api.domain') + 'wxpay/h5_callback'
+    private static final String H5_APP_URL = "https://api.weixin.qq.com/sns/oauth2/access_token"
+    private static final String H5_NOTIFY_PC_URL = "${AppProperties.get('api.domain')}wxpay/h5_callback".toString()
 
     static String formatString(String text) { text ?: "" }
     // 货币类型
@@ -66,7 +69,7 @@ class WxpayController extends BaseController {
     @Resource
     PayController payController
 
-    DBCollection shop(){
+    DBCollection shop() {
         adminMongo.getCollection('shop')
     }
 
@@ -74,20 +77,20 @@ class WxpayController extends BaseController {
      * @apiVersion 0.0.1
      * @apiGroup Pay
      * @apiName order_h5
-     * @api {post} wxpay/order_h5?item_id=:item_id&_id=:_id  微信内H5充值
+     * @api{post} wxpay/order_h5?item_id=:item_id&_id=:_id  微信内H5充值
      * @apiDescription
      * 微信内H5充值
      *
-     * @apiParam {Integer} item_id  商品ID
-     * @apiParam {Integer} _id  用户_id
-     * @apiParam {String} ext  充值扩展字段
+     * @apiParam{Integer} item_id  商品ID
+     * @apiParam{Integer} _id  用户_id
+     * @apiParam{String} ext  充值扩展字段
      *
-     * @apiExample { curl } Example usage:
+     * @apiExample{ curl } Example usage:
      *     curl -i http://test-aiapi.memeyule.com/wxpay/order_h5?item_id=123&_id=123
      *
-     * @apiSuccessExample {json} Success-Response:
+     * @apiSuccessExample{json} Success-Response:
      *
-     * {
+     *{
      *     "data": {
      *         "timestamp": "1509348125",
      *         "result_code": "SUCCESS",
@@ -101,11 +104,10 @@ class WxpayController extends BaseController {
      *         "device_info": "WEB",
      *         "pay_sign": "15E78435C5ECF1431AE2D78040C06004",
      *         "trade_type": "JSAPI"
-     *     },
+     *},
      *     "exec": 75010,
      *     "code": 1
-     * }
-     *
+     *}*
      */
     def order_h5(HttpServletRequest req, HttpServletResponse resp) {
         Integer total_fee = 0
@@ -128,9 +130,9 @@ class WxpayController extends BaseController {
         }
         String ext = ServletRequestUtils.getStringParameter(req, "ext", '')
         total_fee = item['cost'] as Integer
-        String code = req['code']
+        String code = req.getParameter('code')
         //设置请求参数
-        Integer userId = req[_id] as Integer
+        Integer userId = ServletRequestUtils.getIntParameter(req, _id)
         Integer toId = ServletRequestUtils.getIntParameter(req, "to_id", userId)
         //用户ID检测
         if (userId == null || users().count($$('_id', userId)) <= 0) {
@@ -155,7 +157,7 @@ class WxpayController extends BaseController {
             }
             openid = getOpenidByCode(0, code);
         }
-        if(StringUtils.isEmpty(openid))
+        if (StringUtils.isEmpty(openid))
             return Result.丢失必需参数
 
 
@@ -215,20 +217,20 @@ class WxpayController extends BaseController {
      * @apiVersion 0.0.1
      * @apiGroup Pay
      * @apiName order_program
-     * @api {post} wxpay/order_program?item_id=:item_id&_id=:_id  微信小程序充值
+     * @api{post} wxpay/order_program?item_id=:item_id&_id=:_id  微信小程序充值
      * @apiDescription
      * 微信内H5充值
      *
-     * @apiParam {Integer} item_id  商品ID
-     * @apiParam {Integer} _id  用户_id
-     * @apiParam {String} ext  充值扩展字段
+     * @apiParam{Integer} item_id  商品ID
+     * @apiParam{Integer} _id  用户_id
+     * @apiParam{String} ext  充值扩展字段
      *
-     * @apiExample { curl } Example usage:
+     * @apiExample{ curl } Example usage:
      *     curl -i http://test-aiapi.memeyule.com/wxpay/order_program?item_id=123&_id=123
      *
-     * @apiSuccessExample {json} Success-Response:
+     * @apiSuccessExample{json} Success-Response:
      *
-     * {
+     *{
      *     "data": {
      *         "timestamp": "1509348125",
      *         "result_code": "SUCCESS",
@@ -242,11 +244,10 @@ class WxpayController extends BaseController {
      *         "device_info": "WEB",
      *         "pay_sign": "15E78435C5ECF1431AE2D78040C06004",
      *         "trade_type": "JSAPI"
-     *     },
+     *},
      *     "exec": 75010,
      *     "code": 1
-     * }
-     *
+     *}*
      */
     def order_program(HttpServletRequest req, HttpServletResponse resp) {
         Integer total_fee = 0
@@ -258,9 +259,9 @@ class WxpayController extends BaseController {
         }
         String ext = ServletRequestUtils.getStringParameter(req, "ext", '')
         total_fee = item['cost'] as Integer
-        String code = req['code']
+        String code = req.getParameter('code')
         //设置请求参数
-        Integer userId = req[_id] as Integer
+        Integer userId = ServletRequestUtils.getIntParameter(req, _id) as Integer
         Integer toId = ServletRequestUtils.getIntParameter(req, "to_id", userId)
         //用户ID检测
         if (userId == null || users().count($$('_id', userId)) <= 0) {
@@ -285,7 +286,7 @@ class WxpayController extends BaseController {
             }
             openid = getOpenidByCode(code, PROGRAM_APP_ID, PROGRAM_APP_Secret)
         }
-        if(StringUtils.isEmpty(openid))
+        if (StringUtils.isEmpty(openid))
             return Result.丢失必需参数
 
 
@@ -344,20 +345,20 @@ class WxpayController extends BaseController {
      * @apiVersion 0.0.1
      * @apiGroup Pay
      * @apiName qcode_h5
-     * @api {post} wxpay/qcode_h5?item_id=:item_id&_id=:_id  微信二维码充值
+     * @api{post} wxpay/qcode_h5?item_id=:item_id&_id=:_id  微信二维码充值
      * @apiDescription
      * 微信二维码充值
      *
-     * @apiParam {Integer} item_id  商品ID
-     * @apiParam {Integer} _id  用户_id
-     * @apiParam {String} ext  充值扩展字段
+     * @apiParam{Integer} item_id  商品ID
+     * @apiParam{Integer} _id  用户_id
+     * @apiParam{String} ext  充值扩展字段
      *
-     * @apiExample { curl } Example usage:
+     * @apiExample{ curl } Example usage:
      *     curl -i http://test-api.17laihou.com/wxpay/qcode_h5?item_id=123&_id=123
      *
-     * @apiSuccessExample {json} Success-Response:
+     * @apiSuccessExample{json} Success-Response:
      *
-     * {
+     *{
      * "data": {
      *     "return_msg": "OK",
      *     "prepay_id": "wx20171124145537d69176a08f0588346648",
@@ -372,7 +373,7 @@ class WxpayController extends BaseController {
      *     "timestamp": "1511506539",
      *     "mch_id": "1457175402",
      *     "return_code": "SUCCESS"
-     * },
+     *},
      * "exec": 306,
      * "code": 1
      *
@@ -388,7 +389,7 @@ class WxpayController extends BaseController {
         //单位元
         Integer total_fee = item['cost'] as Integer ?: 0
         //设置请求参数
-        Integer userId = req[_id] as Integer
+        Integer userId = ServletRequestUtils.getIntParameter(req, _id)
         Integer toId = ServletRequestUtils.getIntParameter(req, "to_id", userId)
         //用户ID检测
         if (userId == null || users().count($$('_id', userId)) <= 0) {
@@ -462,9 +463,9 @@ class WxpayController extends BaseController {
         WebResponseHandler respHandler = new WebResponseHandler(req, resp);
         respHandler.setKey(H5_APP_KEY);
         //判断签名
-        try{
+        try {
             respHandler.initParametersFromMap(map);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Recv h5_callback: initParametersFromMap Exception : {}", e)
         }
 
@@ -513,31 +514,30 @@ class WxpayController extends BaseController {
      * @apiVersion 0.0.1
      * @apiGroup Pay
      * @apiName order_wap
-     * @api {post} wxpay/order_wap?amount=:amount&_id=:_id  微信外部浏览器H5充值
+     * @api{post} wxpay/order_wap?amount=:amount&_id=:_id  微信外部浏览器H5充值
      * @apiDescription
      * 微信外部浏览器H5充值
      *
-     * @apiParam {Integer} amount  充值金额amount
-     * @apiParam {Integer} _id  用户_id
-     * @apiParam {String} ext  充值扩展字段
+     * @apiParam{Integer} amount  充值金额amount
+     * @apiParam{Integer} _id  用户_id
+     * @apiParam{String} ext  充值扩展字段
      *
-     * @apiExample { curl } Example usage:
+     * @apiExample{ curl } Example usage:
      *     curl -i http://test-aiapi.memeyule.com/wxpay/order_wap?amount=123&_id=123
      *
-     * @apiSuccessExample {json} Success-Response:
-     *
-      {
-          "data": {
-              "url": "weixin://wap/pay?appid%3Dwx45d43a50adf5a470%26noncestr%3D92262bf907af914b95a0fc33c3f33bf6%26package%3DWAP%26prepayid%3Dwx201711031131
-              59cdaee1cfd30484335726%26sign%3DAF6F733D4C17E19EC2C775AF178F07A9%26timestamp%3D1509680056"
-          },
-          "exec": 18432,
-          "code": 1
-      }
+     * @apiSuccessExample{json} Success-Response:
+     *{
+     "data": {
+     "url": "weixin://wap/pay?appid%3Dwx45d43a50adf5a470%26noncestr%3D92262bf907af914b95a0fc33c3f33bf6%26package%3DWAP%26prepayid%3Dwx201711031131
+     59cdaee1cfd30484335726%26sign%3DAF6F733D4C17E19EC2C775AF178F07A9%26timestamp%3D1509680056"
+     },
+     "exec": 18432,
+     "code": 1
+     }
      */
     def order_wap(HttpServletRequest req, HttpServletResponse rsp) {
         Integer total_fee = 0
-        Integer userId = req[_id] as Integer
+        Integer userId = req.getParameter(_id) as Integer
         //String sTotatFee = req.getParameter("amount")
         Integer toId = ServletRequestUtils.getIntParameter(req, "to_id", userId)
         Integer schema_type = ServletRequestUtils.getIntParameter(req, 'schema_type', 0)
@@ -581,8 +581,8 @@ class WxpayController extends BaseController {
         reqHandler.setParameter("appid", H5_APP_ID);//银行渠道
         reqHandler.setParameter("mch_id", H5_MCH_ID);//商户号
         //reqHandler.setParameter("device_info", "WEB");//设备号
-        String noncestr =  WXUtil.getNonceStr()
-        reqHandler.setParameter("nonce_str",noncestr);
+        String noncestr = WXUtil.getNonceStr()
+        reqHandler.setParameter("nonce_str", noncestr);
         reqHandler.setParameter("body", '钻石');//商品描述
         reqHandler.setParameter("out_trade_no", out_trade_no);//商户订单号
         reqHandler.setParameter("fee_type", 'CNY');//货币类型
@@ -627,7 +627,7 @@ class WxpayController extends BaseController {
                     url = "weixin://wap/pay?appid=${H5_APP_ID}&noncestr=${noncestr}&package=WAP&prepayid=${prepay_id}&sign=${sign}&timestamp=${timestamp}".toString()
                 }
 
-                return [code: 1, data:[url:url]]
+                return [code: 1, data: [url: url]]
             }
         }
         return [code: 30411]//错误：获取prepayId失败
@@ -638,7 +638,7 @@ class WxpayController extends BaseController {
      * 微信公众平台授权
      * https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
      */
-    private static String getOpenidByCode(Integer userId, String code){
+    private static String getOpenidByCode(Integer userId, String code) {
         logger.debug("auth login code: {}", code)
         def token_url = H5_APP_URL + "?appid=${H5_APP_ID}&secret=${H5_APP_Secret}&code=${code}&grant_type=authorization_code"
         logger.debug("auth login token_url: {}", token_url)
@@ -650,7 +650,7 @@ class WxpayController extends BaseController {
         return openId
     }
 
-    private static String getOpenidByCode(String code, String app_id, String app_secret){
+    private static String getOpenidByCode(String code, String app_id, String app_secret) {
         logger.debug("auth login code: {}", code)
         def token_url = H5_APP_URL + "?appid=${app_id}&secret=${app_secret}&code=${code}&grant_type=authorization_code"
         logger.debug("auth login token_url: {}", token_url)

@@ -174,7 +174,7 @@ class PayController extends BaseController {
      * @return
      */
     def find_delay_order(HttpServletRequest req) {
-        String orderId = req['order_id'] as String
+        String orderId = req.getParameter('order_id') as String
         def viaSets = Order.orderProcessList.keySet()
         for (String via : viaSets) {
             logger.debug("find_delay_order {} : {}", orderId, via);
