@@ -244,12 +244,12 @@ public abstract class Qiyiguo {
             return null;
         }
         try {
-            JavaType paramType = createJavaType(parameterClasses);
+            /*JavaType paramType = createJavaType(parameterClasses);
             JavaType javaType = typeFactory.constructParametricType(QiygRespDTO.class, paramType);
             QiygRespDTO<T> result = JSONUtil.jsonToBean(value, javaType);
             if (result != null && result.getDone() && result.getRetval() != null) {
                 return result.getRetval();
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("translate json to bean error: " + value);
@@ -258,7 +258,7 @@ public abstract class Qiyiguo {
     }
 
     private static JavaType createJavaType(Class<?>... param) {
-        if (param.length == 1) {
+        /*if (param.length == 1) {
             return typeFactory.uncheckedSimpleType(param[0]);
         }else if (param.length == 2) {
             if (param[0].equals(List.class)) {
@@ -267,7 +267,7 @@ public abstract class Qiyiguo {
                 logger.error("unknown param type");
                 return null;
             }
-        }
+        }*/
         return null;
     }
 
@@ -275,11 +275,11 @@ public abstract class Qiyiguo {
         String value = null;
         url = url + "?" +buildParam(params);
         try {
-            if (url.startsWith("http://")) {
+            /*if (url.startsWith("http://")) {
                 value = HttpClientUtils.get(url, null);
             } else if (url.startsWith("https://")) {
                 value = HttpsClientUtils.get(url, null);
-            }
+            }*/
         } catch (Exception e) {
             logger.error("Get " + url + " error.", e);
         }
@@ -290,11 +290,11 @@ public abstract class Qiyiguo {
         String value = null;
 
         try {
-            if (url.startsWith("http://")) {
+            /*if (url.startsWith("http://")) {
                 value = HttpClientUtils.post(url, buildPostParam(params), null);
             } else if (url.startsWith("https://")) {
                 value = HttpsClientUtils.post(url, buildPostParam(params),null);
-            }
+            }*/
         } catch (Exception e) {
             logger.error("Post " + url + " error.", e);
         }

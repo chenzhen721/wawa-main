@@ -8,6 +8,7 @@ import com.wawa.common.util.KeyUtils
 import com.wawa.common.util.RandomExtUtils
 import com.wawa.model.UserAwardType
 import com.wawa.web.partner.QiyiguoPublicController
+import com.wawa.web.partner.WawaPublicController
 import groovy.json.JsonSlurper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -31,7 +32,7 @@ class CatchuPublicController extends BaseController {
     @Resource
     private CatchuController catchuController
     @Resource
-    private QiyiguoPublicController qiyiguoPublicController
+    private WawaPublicController wawaPublicController
 
     DBCollection catch_rooms() {
         return catchMongo.getCollection('catch_room')
@@ -92,7 +93,7 @@ class CatchuPublicController extends BaseController {
      */
     def room_list(HttpServletRequest req) {
         //def partner = ServletRequestUtils.getIntParameter(req, 'partner', 1)
-        return qiyiguoPublicController.room_list(req)
+        return wawaPublicController.room_list(req)
     }
 
     public static final String domain = "api.memeyule.com/"

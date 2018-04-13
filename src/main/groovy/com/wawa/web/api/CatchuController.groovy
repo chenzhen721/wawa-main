@@ -4,22 +4,22 @@ import com.mongodb.BasicDBObject
 import com.mongodb.DBCollection
 import com.mongodb.DBObject
 import com.wawa.api.Web
-import com.wawa.base.anno.RestWithSession
-import com.wawa.common.doc.TwoTableCommit
+import com.wawa.base.BaseController
 import com.wawa.base.Crud
+import com.wawa.base.anno.RestWithSession
 import com.wawa.common.doc.Result
+import com.wawa.common.doc.TwoTableCommit
 import com.wawa.common.util.HttpClientUtils
 import com.wawa.common.util.JSONUtil
 import com.wawa.common.util.LabMsgExecutor
 import com.wawa.common.util.RandomExtUtils
 import com.wawa.model.CatchObserveStatus
-import com.wawa.model.CatchPartnerType
 import com.wawa.model.CatchPostChannel
 import com.wawa.model.CatchPostStatus
 import com.wawa.model.CatchPostType
 import com.wawa.model.UserAwardType
-import com.wawa.base.BaseController
 import com.wawa.web.partner.QiyiguoController
+import com.wawa.web.partner.WawaController
 import groovy.json.JsonSlurper
 import org.apache.commons.lang.StringUtils
 import org.slf4j.Logger
@@ -30,8 +30,12 @@ import org.springframework.web.bind.ServletRequestUtils
 import javax.annotation.Resource
 import javax.servlet.http.HttpServletRequest
 
+import static com.wawa.common.doc.MongoKey.$inc
+import static com.wawa.common.doc.MongoKey.$set
+import static com.wawa.common.doc.MongoKey.$unset
+import static com.wawa.common.doc.MongoKey.ALL_FIELD
+import static com.wawa.common.doc.MongoKey.SJ_DESC
 import static com.wawa.common.util.WebUtils.$$
-import static com.wawa.common.doc.MongoKey.*
 
 /**
  * 抓娃娃
@@ -47,7 +51,7 @@ class CatchuController extends BaseController {
     public static final JsonSlurper jsonSlurper = new JsonSlurper()
 
     @Resource
-    QiyiguoController qiyiguoController
+    WawaController wawaController
     @Resource
     UserController userController
 
@@ -185,7 +189,7 @@ class CatchuController extends BaseController {
         room['is_replace'] = goods['is_replace']
         room['type'] = goods['type']
         room.put('is_following', userController.isFollowing(Web.currentUserId, roomId))
-        return qiyiguoController.room(room as Map)
+        return wawaController.room(room as Map)
     }
 
     /**
@@ -322,7 +326,7 @@ class CatchuController extends BaseController {
         room.put('toy_id', goods['toy_id'])
         room.put('gid', goods_id)
 
-        return qiyiguoController.start(room as Map)
+        return wawaController.start(room as Map)
     }
 
     /**
@@ -358,7 +362,7 @@ class CatchuController extends BaseController {
         if (!room) {
             return Result.丢失必需参数
         }
-        return qiyiguoController.cancel_play(req)
+        return wawaController.cancel_play(req)
     }
 
     /**
