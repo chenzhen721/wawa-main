@@ -16,7 +16,7 @@
         <maven-jar-plugin-version>2.4</maven-jar-plugin-version>
         <maven-compiler-plugin-version>3.1</maven-compiler-plugin-version>
 
-        <groovy-all-compiler-version>2.4.13</groovy-all-compiler-version>
+        <groovy-all-compiler-version>2.4.15</groovy-all-compiler-version>
         <groovy-scope>provided</groovy-scope>
 
         <spring-version>4.3.14.RELEASE</spring-version>
@@ -338,15 +338,15 @@
                 <redis.im.port>6379</redis.im.port>
                 <redis.user.host>${redis.host}</redis.user.host>
                 <redis.user.port>6379</redis.user.port>
-                <api.domain>http://localhost:9001/</api.domain>
-                <user.domain>http://localhost:9002/</user.domain>
+                <api.domain>http://localhost:9002/</api.domain>
+                <user.domain>http://test-user.doll520.com/</user.domain>
                 <pic.domain>http://test-aiimg.sumeme.com/</pic.domain>
                 <im.domain>http://test-aiim.memeyule.com:6070</im.domain>
-                <server.domain>ws://localhost:9001/machine</server.domain>
-                <stream.domain>ws://localhost:9001/push</stream.domain>
+                <server.domain>ws://test-server.doll520.com/machine</server.domain>
+                <stream.domain>ws://test-server.doll520.com/push</stream.domain>
                 <!--<wsvideo.domain>http://39.106.130.135:7600</wsvideo.domain>-->
                 <gif.domain>http://record.lezhuale.com/</gif.domain>
-                <m.domain>http://test.lezhuale.com/</m.domain>
+                <m.domain>http://test.doll520.com/</m.domain>
                 <pic.folder>/Users/Administrator/Downloads/</pic.folder>
                 <!--<log.error.target>stdout</log.error.target>-->
             </properties>

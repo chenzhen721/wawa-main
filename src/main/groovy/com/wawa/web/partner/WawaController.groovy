@@ -5,9 +5,9 @@ import com.mongodb.DBCollection
 import com.wawa.api.DoCost
 import com.wawa.api.Web
 import com.wawa.api.notify.RoomMsgPublish
-import com.wawa.api.play.Qiyiguo
-import com.wawa.api.play.dto.QiygAssignDTO
-import com.wawa.api.play.dto.QiygRoomDTO
+import com.wawa.api.play.WawaMachine
+import com.wawa.api.play.dto.WWAssignDTO
+import com.wawa.api.play.dto.WWRoomDTO
 import com.wawa.base.BaseController
 import com.wawa.base.anno.RestWithSession
 import com.wawa.common.doc.MsgAction
@@ -124,12 +124,12 @@ class WawaController extends BaseController{
      */
     def room(Map room) {
         def roomId = room['_id'] as Integer
-        QiygRoomDTO roomDTO = Qiyiguo.room_detail(room['fid'] as String)
+        WWRoomDTO roomDTO = WawaMachine.room_detail(room['fid'] as String)
         if (room == null) {
             return Result.error
         }
         if (roomDTO != null) {
-            def status = roomDTO.status
+            def status = roomDTO.device_status
             room.putAll(room_player(roomId, status))
         }
 
@@ -180,11 +180,11 @@ class WawaController extends BaseController{
         def fid = room['fid'] as String
         def userId = Web.currentUserId
         //查询房间状态，如果不为空闲
-        QiygRoomDTO roomDTO = Qiyiguo.room_detail(fid)
-        if (roomDTO == null || roomDTO.status == null) {
+        WWRoomDTO roomDTO = WawaMachine.room_detail(fid)
+        if (roomDTO == null || roomDTO.getOnline_status() != 'on') {
             return Result.设备维护中
         }
-        def status = roomDTO.status
+        def status = roomDTO.device_status
         if (status == 2) {
             return Result.设备维护中
         }
@@ -193,7 +193,9 @@ class WawaController extends BaseController{
         if (userRoomId != null && userRoomId != roomId) {
             return Result.您正在其它房间游戏中
         }
+        //todo 房间状态信息
         Map playerInfo = Room.getPlayerInfo(mainRedis, roomId)
+        logger.info('playerinfo: ' + playerInfo)
         if (playerInfo != null) {
             if (userId == playerInfo[Room.user_id] && playerInfo[Room.record_id] != null) {
                 if ('1' != playerInfo[Room.finish]) {
@@ -252,17 +254,15 @@ class WawaController extends BaseController{
         //status 成功 true 失败 false
         //type 0-扣费 1-投币开始 2-结束 3-异常对账记录
         //n 用于补偿次数记录
+        //todo 生成抓力控制参数
+        int lw = 100
+        int hw = 100
+        int htl = 100
         def record = [_id: record_id, user_id: userId, room_id: roomId, fid: fid, type: CatchRecordType.扣费.ordinal(),
                       status: false, device_type: room['device_type'], channel: toy['channel'], coin: price, gid: room['gid'],
                       toy_points: toy['points'], cost: cost, n: 0, timestamp: t, is_delete: false, is_award: false] as Map
         if (toy != null) {
             def toy_record = [_id: toy['_id'], channel: toy['channel'], name: toy['name'], pic: toy['pic'], head_pic: toy['head_pic'], desc: toy['desc']]
-            if (toy['channel'] == CatchPostChannel.奇异果.ordinal()) {
-                if (toy['goods_id'] == null) {
-                    return Result.设备维护中
-                }
-                record.put('goods_id', toy['goods_id'])
-            }
             record.put('toy', toy_record)//记录礼物
         }
         def cost_log = Web.logCost("catch_live", toy['price'] as Integer, roomId, null)
@@ -271,20 +271,19 @@ class WawaController extends BaseController{
             @Override
             boolean costSuccess() {
                 // 扣费成功调用绑定接口
-                QiygAssignDTO qiygAssignDTO = Qiyiguo.assign(fid, userId)
+                WWAssignDTO qiygAssignDTO = WawaMachine.assign(fid, record_id, userId, lw, hw, htl)
                 if (qiygAssignDTO == null) {
                     assign = Boolean.FALSE
                     return false
                 }
                 record.put('log_id', qiygAssignDTO.getLog_id()) //游戏记录
-                record.put('play_time', qiygAssignDTO.getTime()) //游戏时长
+                record.put('play_time', qiygAssignDTO.getPlaytime()) //游戏时长
                 record.put('ws_url', qiygAssignDTO.getWs_url())  //socket地址
                 //更改redis时间，观看者显示倒计时
-                def time = qiygAssignDTO.getTime()
+                def time = qiygAssignDTO.getPlaytime()
                 value.put(Room.play_time, '' + time)
                 value.put(Room.play_until, '' + (System.currentTimeMillis() + (time + 1) * 1000L))
                 value.put(Room.ws_url, qiygAssignDTO.getWs_url())
-
                 Room.put(mainRedis, roomId, value)
                 return true
             }
@@ -310,7 +309,7 @@ class WawaController extends BaseController{
         def user = users().findOne(userId, $$(nick_name: 1, pic: 1))
         def obj = [type: CatchMsgType.游戏开始.ordinal(), result: record_id, user: user, timestamp: t, play_time: record['play_time']]
         RoomMsgPublish.publish2Room(roomId, MsgAction.抓娃娃, obj, false)
-        RoomMsgPublish.roomVideoRestart(roomId, record_id)
+        //RoomMsgPublish.roomVideoRestart(roomId, record_id)
         //RoomMsgPublish.roomVideoDispatchRestart(roomId, record_id)
 
         //增加一个延迟补偿队列, 到这个时间无论用户有没有收到回调都会弹出结果界面

@@ -4,11 +4,11 @@ package com.wawa.api.play.dto;
  * 返回上机结果
  * Created by Administrator on 2017/11/10.
  */
-public class WawaAssignDTO {
+public class WWAssignDTO {
     private String device_id;
     private String log_id;
-    private Integer status;
     private String ws_url;
+    private Integer playtime;
 
     public String getDevice_id() {
         return device_id;
@@ -32,5 +32,13 @@ public class WawaAssignDTO {
 
     public void setWs_url(String ws_url) {
         this.ws_url = ws_url;
+    }
+
+    public Integer getPlaytime() {
+        return playtime;
+    }
+
+    public void setPlaytime(Integer playtime) {
+        this.playtime = playtime;
     }
 }

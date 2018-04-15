@@ -5,15 +5,15 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/11/10.
  */
-public class WawaListDTO {
+public class WWListDTO {
 
-    private List<WawaRoomDTO> list;
+    private List<WWRoomDTO> list;
 
-    public List<WawaRoomDTO> getList() {
+    public List<WWRoomDTO> getList() {
         return list;
     }
 
-    public void setList(List<WawaRoomDTO> list) {
+    public void setList(List<WWRoomDTO> list) {
         this.list = list;
     }
 }

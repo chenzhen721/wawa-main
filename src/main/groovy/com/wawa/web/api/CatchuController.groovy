@@ -546,7 +546,7 @@ class CatchuController extends BaseController {
                     obj['remaining'] = remaining >= 0 ? remaining : 0 //剩余天数
                     obj['is_delete'] = obj['is_delete'] ?: false //是否删除
                     def diamond = obj['coin'] as Integer
-                    obj['award_points'] = obj['toy_points'] ?: (diamond * 100).intValue() //todo 奖励积分
+                    obj['award_points'] = obj['toy_points'] ?: 0 //奖励积分
                     obj['is_award'] = obj['is_award'] ?: false //是否兑换积分
                 } else {
                     obj['user'] = users().findOne(obj['user_id'] as Integer, $$(nick_name: 1, pic: 1))
@@ -881,7 +881,7 @@ class CatchuController extends BaseController {
         def time = System.currentTimeMillis()
         def timeStr = new Date().format('yyMMddHHmmss')
         def pack_id = "${timeStr}${userId}".toString()
-        def logs = catch_success_logs().find($$(_id: [$in: ids]), $$(room_id: 1, toy: 1, goods_id: 1))
+        def logs = catch_success_logs().find($$(_id: [$in: ids]), $$(room_id: 1, toy: 1))
         def toys = create_toy(logs)
         def logWithId = $$([_id         : pack_id, user_id: userId, record_ids: ids, toys: toys, timestamp: time, post_type: CatchPostType.待发货.ordinal(),
                                                                 status      : CatchPostStatus.未审核.ordinal(), address: address, address_list: addressstr, is_delete: false,
@@ -904,12 +904,6 @@ class CatchuController extends BaseController {
         def toys = []
         logs.each { BasicDBObject obj ->
             def toy = obj['toy'] as Map
-            if (toy['channel'] == CatchPostChannel.奇异果.ordinal()) {
-                if (toy['goods_id'] == null) {
-                    Integer goods_id = obj['goods_id'] as Integer ?: null
-                    toy.put('goods_id', goods_id)
-                }
-            }
             toy.put('room_id', obj['room_id'])
             toy.put('record_id', obj['_id'])
             toys.add(obj['toy'])

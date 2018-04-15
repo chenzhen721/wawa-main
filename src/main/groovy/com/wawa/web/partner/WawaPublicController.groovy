@@ -7,7 +7,9 @@ import com.wawa.AppProperties
 import com.wawa.api.Web
 import com.wawa.api.notify.RoomMsgPublish
 import com.wawa.api.play.Qiyiguo
+import com.wawa.api.play.WawaMachine
 import com.wawa.api.play.dto.QiygOperateResultDTO
+import com.wawa.api.play.dto.WWOperateResultDTO
 import com.wawa.base.BaseController
 import com.wawa.base.Crud
 import com.wawa.base.anno.Rest
@@ -53,6 +55,8 @@ class WawaPublicController extends BaseController {
     @Resource
     private QiyiguoController qiyiguoController
     @Resource
+    private WawaController wawaController
+    @Resource
     private UserController userController
 
     DBCollection catch_rooms() {
@@ -84,7 +88,7 @@ class WawaPublicController extends BaseController {
     public void init2() {
         final String gif_domain = GIF_DOMAIN
         //游戏结束通知倒计时
-        qiyiguoController.createNotifyQueue(qiyiguoController.result_notify_queue, new DelayQueueRedis.DelayQueueJobListener(){
+        wawaController.createNotifyQueue(wawaController.result_notify_queue, new DelayQueueRedis.DelayQueueJobListener(){
             @Override
             void doJob(DelayQueueRedis.Task task) {
                 //task的ID为房间id desc是房间和用户信息
@@ -97,11 +101,11 @@ class WawaPublicController extends BaseController {
                 def user_id = obj['user_id'] as Integer
                 def record_id = obj['record_id'] as String
                 logger.debug('>>>>>>>>>>>>>>>>>>>>>>>>>result notify queue,' + JSONUtil.beanToJson(task))
-                qiyiguoController.finish_notify(room_id, user_id, record_id)
+                wawaController.finish_notify(room_id, user_id, record_id)
             }
         })
         //游戏时间到期
-        qiyiguoController.createNotifyQueue(qiyiguoController.room_finish_queue, new DelayQueueRedis.DelayQueueJobListener(){
+        wawaController.createNotifyQueue(wawaController.room_finish_queue, new DelayQueueRedis.DelayQueueJobListener(){
             @Override
             void doJob(DelayQueueRedis.Task task) {
                 //task的ID为房间id desc是房间和用户信息
@@ -118,9 +122,9 @@ class WawaPublicController extends BaseController {
                 def user_id = obj['user_id'] as Integer
                 def record_id = obj['record_id'] as String
                 //step.1 查询当前房间record是否为同一个，如果不是同一个直接忽略
-                def player_info = QiyiguoController.Room.getPlayerInfo(mainRedis, room_id)
-                def user_room_id = QiyiguoController.Room.getPlayerRoomId(mainRedis, user_id)
-                if ((player_info == null && user_room_id != room_id) || player_info[QiyiguoController.Room.finish] == '1' || player_info[QiyiguoController.Room.record_id] != record_id) {
+                def player_info = WawaController.Room.getPlayerInfo(mainRedis, room_id)
+                def user_room_id = WawaController.Room.getPlayerRoomId(mainRedis, user_id)
+                if ((player_info == null && user_room_id != room_id) || player_info[WawaController.Room.finish] == '1' || player_info[WawaController.Room.record_id] != record_id) {
                     //已进入正常流程无需额外处理
                     logger.debug('======success process callback, drop.')
                     return
@@ -135,15 +139,15 @@ class WawaPublicController extends BaseController {
                 }
                 def log_id = records['log_id'] as String
                 def device_id = records['fid'] as String
-
-                QiygOperateResultDTO operateResultDTO = Qiyiguo.operateResult(log_id)
+                //todo 需要重新梳理的最重要的业务流程
+                /*QiygOperateResultDTO operateResultDTO = WawaMachine.operateResult(log_id)
                 logger.debug('>>>>>>>>>>>>>>>>>>>operate log_id: ' + log_id + ', result:' + JSONUtil.beanToJson(operateResultDTO))
                 def result = ''
                 Integer goods_id = records['goods_id'] as Integer
                 if (goods_id == null) {
                     goods_id =  getGoodsId(records['gid'] as Integer) ?: null
                 }
-                def params = [platform: Qiyiguo.PLATFORM, user_id: user_id, log_id: log_id, device_id: device_id, goods_id: goods_id, ts: '' + current, address: '', consignee: '', mobile: '']
+                def params = [platform: WawaMachine.PLATFORM, user_id: user_id, log_id: log_id, device_id: device_id, goods_id: goods_id, ts: '' + current, address: '', consignee: '', mobile: '']
                 if (goods_id != null && operateResultDTO != null && operateResultDTO.getOperate_result() != null) {
                     params.put('operate_result', operateResultDTO.getOperate_result())
                     result = result_callback(Qiyiguo.PLATFORM, user_id, log_id, device_id, operateResultDTO.getOperate_result(), goods_id, createSign(params), '' + current, '', '', '')
@@ -152,8 +156,8 @@ class WawaPublicController extends BaseController {
                         params.put('operate_result', 2)
                         result = result_callback(Qiyiguo.PLATFORM, user_id, log_id, device_id, 2, goods_id, createSign(params), '' + current, '', '', '')
                     }
-                }
-                logger.debug('>>>>>>>>>>>>>>>>>>>>>>>>>>result_callback:' + result)
+                }*/
+                //logger.debug('>>>>>>>>>>>>>>>>>>>>>>>>>>result_callback:' + result)
             }
         })
         //初始化延迟队列
@@ -205,7 +209,7 @@ class WawaPublicController extends BaseController {
                     def list = catch_records().find(query).sort($$(n: 1)).limit(2).toArray()
                     for(DBObject obj : list) {
                         logger.debug('==============record id:' + obj['_id'])
-                        QiygOperateResultDTO operateResultDTO = Qiyiguo.operateResult(obj['log_id'] as String)
+                        WWOperateResultDTO operateResultDTO = WawaMachine.operateResult(obj['log_id'] as String)
                         def record = [:]
                         def inc = [:]
                         if (obj['replay_url'] == null) {
@@ -242,7 +246,7 @@ class WawaPublicController extends BaseController {
                                     saveSuccessRecord(obj)
                                 }
                             }
-                            qiyiguoController.deleteIfNE(obj['room_id'] as Integer, obj['_id'] as String, obj['user_id'] as Integer)
+                            wawaController.deleteIfNE(obj['room_id'] as Integer, obj['_id'] as String, obj['user_id'] as Integer)
                         }
                     }
                 } catch (Exception e) {
@@ -253,7 +257,7 @@ class WawaPublicController extends BaseController {
         })
     }
 
-    private Integer getGoodsId(Integer goods_id) {
+    /*private Integer getGoodsId(Integer goods_id) {
         //列表页缓存
         def goods = goods().findOne($$(_id: goods_id))
         if (goods == null) {
@@ -265,7 +269,7 @@ class WawaPublicController extends BaseController {
             return null
         }
         return toy['goods_id'] as Integer
-    }
+    }*/
 
     /**
      * @apiVersion 0.0.1
@@ -336,9 +340,6 @@ class WawaPublicController extends BaseController {
             List list = goods().find(query, ALL_FIELD).sort(order).skip(MIN_ROOM_COUNT).limit(100).toArray() as List<BasicDBObject>
             if (list.size() > MIN_ROOM_COUNT) {
                 Collections.shuffle(list)
-                if (isEasyMode(req)) {
-                    sort(list)
-                }
                 data = [code: 1, data: list.subList(0,size)]
             }
         } else {
@@ -353,9 +354,6 @@ class WawaPublicController extends BaseController {
         if (type == 2 && list?.size() < 2) {
             data['data'] = []
             return data
-        }
-        if (isEasyMode(req)) {
-            sort(list)
         }
         def offline = room_map['offline'] as List
         if (!offline.isEmpty()) {
@@ -424,37 +422,16 @@ class WawaPublicController extends BaseController {
 
     public int getRoomStatus(Integer roomId) {
         def status = 0
-        def playerinfo = QiyiguoController.Room.getPlayerInfo(mainRedis, roomId)
+        def playerinfo = WawaController.Room.getPlayerInfo(mainRedis, roomId)
         if (playerinfo != null) {
             status = 1
         }
         return status
     }
 
-    private boolean isEasyMode(HttpServletRequest req) {
-        def obj = Web.getUserByAccessToken(req)
-        if (obj == null || obj['_id'] == null) {
-            return false
-        }
-        def userId = obj['_id'] as Integer
-        String key = KeyUtils.USER.first_doll(userId)
-        if (mainRedis.hasKey(key)) {
-            return true
-        }
-        return false
-    }
-
-    private void sort(List list) {
-        Collections.sort(list, new Comparator<Map>() {
-            @Override
-            int compare(Map o1, Map o2) {
-                return (o2['partner'] as Integer) - (o1['partner'] as Integer)
-            }
-        })
-    }
-
     /**
      * log_id  第三方游戏记录
+     * 游戏结果回调
      * operate_result 1成功 2失败
      * @param req
      */
@@ -477,7 +454,7 @@ class WawaPublicController extends BaseController {
     def result_callback(String platform, Integer user_id, String log_id, String device_id, Integer operate_result, Integer goods_id, String remoteSign, String ts, String address, String consignee, String mobile) {
         def params = [platform: platform, user_id: user_id, log_id: log_id, device_id: device_id, address: address, consignee: consignee, mobile: mobile, operate_result: operate_result, goods_id: goods_id, ts: ts]
         def localSign = createSign(params)
-        logger.error('===============receive qiyiguo callback. local sign: ' + localSign + ' remote:' + remoteSign)
+        logger.error('===============receive wawa callback. local sign: ' + localSign + ' remote:' + remoteSign)
         /*if (localSign != remoteSign) {
             logger.error('===============receive qiyiguo callback error. local sign: ' + localSign + ' missmatch from:' + remoteSign)
             return [code: 0]
@@ -488,9 +465,6 @@ class WawaPublicController extends BaseController {
         logger.info('===============receive callback records:' + records)
         if (records == null) {
             return [code: 0]
-        }
-        if (isTest) {//todo 测试用
-            operate_result = 1
         }
         def data = operate_result == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString()
         def record = $$(log_id: log_id, operate_result: operate_result, timestamp: System.currentTimeMillis())
@@ -527,11 +501,11 @@ class WawaPublicController extends BaseController {
             if (points != null) {
                 obj.put('points', points)
             }
-            qiyiguoController.continue_notify(roomId, user_id, records['_id'] as String, obj)
+            wawaController.continue_notify(roomId, user_id, records['_id'] as String, obj)
             //兜底 延迟6.5秒后发送结束消息 desc需要改
-            qiyiguoController.addTask(qiyiguoController.result_notify_queue, records['room_id'] as Integer, user_id, [record_id: records['_id']], 6500L)
+            wawaController.addTask(wawaController.result_notify_queue, records['room_id'] as Integer, user_id, [record_id: records['_id']], 6500L)
         }
-        RoomMsgPublish.roomVideoPause(records['room_id'], records['_id'])
+        //RoomMsgPublish.roomVideoPause(records['room_id'], records['_id'])
         //RoomMsgPublish.roomVideoDispatchPause(records['room_id'], records['_id'])
 
         // 抓必中调整

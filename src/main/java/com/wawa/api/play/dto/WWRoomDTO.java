@@ -4,14 +4,14 @@ package com.wawa.api.play.dto;
  * 娃娃机设备列表信息
  * Created by Administrator on 2017/11/10.
  */
-public class WawaRoomDTO {
+public class WWRoomDTO {
 
     private String _id; //设备id
     private String name; //设备名称
     private String server_uri; //控制socket
     private String stream_uri; //视频流socket地址
     private String online_status; //on off
-    private String device_status; //机器状态 0-空闲 1-游戏中 2-维护中
+    private int device_status; //机器状态 0-空闲 1-游戏中 2-维护中
 
     public String get_id() {
         return _id;
@@ -53,11 +53,11 @@ public class WawaRoomDTO {
         this.online_status = online_status;
     }
 
-    public String getDevice_status() {
+    public int getDevice_status() {
         return device_status;
     }
 
-    public void setDevice_status(String device_status) {
+    public void setDevice_status(int device_status) {
         this.device_status = device_status;
     }
 }

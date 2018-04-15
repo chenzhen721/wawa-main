@@ -2,17 +2,11 @@ package com.wawa.api.play;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.wawa.api.play.dto.QiygAssignDTO;
-import com.wawa.api.play.dto.QiygListDTO;
-import com.wawa.api.play.dto.QiygOperateResultDTO;
-import com.wawa.api.play.dto.QiygOrderResultDTO;
-import com.wawa.api.play.dto.QiygRespDTO;
-import com.wawa.api.play.dto.QiygResultDTO;
-import com.wawa.api.play.dto.QiygRoomDTO;
-import com.wawa.api.play.dto.WawaAssignDTO;
-import com.wawa.api.play.dto.WawaListDTO;
-import com.wawa.api.play.dto.WawaRoomDTO;
-import com.wawa.api.play.model.OperateType;
+import com.wawa.api.play.dto.RespDTO;
+import com.wawa.api.play.dto.WWAssignDTO;
+import com.wawa.api.play.dto.WWListDTO;
+import com.wawa.api.play.dto.WWOperateResultDTO;
+import com.wawa.api.play.dto.WWRoomDTO;
 import com.wawa.base.BaseController;
 import com.wawa.common.util.HttpClientUtils;
 import com.wawa.common.util.HttpsClientUtils;
@@ -22,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +30,7 @@ public abstract class WawaMachine {
 
     static final Logger logger = LoggerFactory.getLogger(WawaMachine.class);
 
-    public static final String HOST = BaseController.isTest ? "http://test-server.doll520.com" : "";
+    public static final String HOST = BaseController.isTest ? "http://test-server.doll520.com" : "http://test-server.doll520.com";
     public static final String APP_ID = BaseController.isTest ? "wawa_default" : "wawa_default";
     public static final String APP_SECRET = BaseController.isTest ? "ab75e7a2de882107d3bc89948a1baa9e" : "ab75e7a2de882107d3bc89948a1baa9e";
     public static final MsgDigestUtil md5 = MsgDigestUtil.MD5;
@@ -59,24 +52,24 @@ public abstract class WawaMachine {
     /**
      * 1.娃娃机列表
      */
-    public static List<WawaRoomDTO> room_list() {
+    public static List<WWRoomDTO> room_list() {
         String url = HOST + "/public/list";
         SortedMap<String, Object> params = new TreeMap<>();
         params.put("app_id", APP_ID);
         params.put("page", 1);
         params.put("size", 100);
         String value = doGet(url, params);
-        WawaListDTO wawaListDTO = toBean(value, WawaListDTO.class);
-        if (wawaListDTO == null || wawaListDTO.getList() == null) {
+        WWListDTO WWListDTO = toBean(value, WWListDTO.class);
+        if (WWListDTO == null || WWListDTO.getList() == null) {
             return null;
         }
-        return wawaListDTO.getList();
+        return WWListDTO.getList();
     }
 
     /**
      *  2.娃娃机详情
      */
-    public static WawaRoomDTO room_detail(String roomId) {
+    public static WWRoomDTO room_detail(String roomId) {
         if (roomId == null) {
             return null;
         }
@@ -86,7 +79,7 @@ public abstract class WawaMachine {
         params.put("device_id", roomId);
         params.put("ts", System.currentTimeMillis());
         String value = doGet(url, params);
-        return toBean(value, WawaRoomDTO.class);
+        return toBean(value, WWRoomDTO.class);
     }
 
 //    /**
@@ -108,7 +101,7 @@ public abstract class WawaMachine {
     /**
      * 3.申请分配娃娃机
      */
-    public static WawaAssignDTO assign(String roomId, String record_id, Integer userId, Integer lw, Integer hw, Integer htl) {
+    public static WWAssignDTO assign(String roomId, String record_id, Integer userId, Integer lw, Integer hw, Integer htl) {
         if (roomId == null || userId == null) {
             return null;
         }
@@ -124,13 +117,13 @@ public abstract class WawaMachine {
         params.put("htl", htl); //强转弱
         params.put("ts", System.currentTimeMillis()); //暂时没用上 给签名使用的
         String value = doGet(url, params);
-        return toBean(value, WawaAssignDTO.class);
+        return toBean(value, WWAssignDTO.class);
     }
 
     /**
-     * 6.查询操作结果
+     * 6.查询操作结果 //todo
      */
-    /*public static QiygOperateResultDTO operateResult(String logId) {
+    public static WWOperateResultDTO operateResult(String logId) {
         if (logId == null) {
             return null;
         }
@@ -138,12 +131,11 @@ public abstract class WawaMachine {
         SortedMap<String, Object> params = new TreeMap<>();
         params.put("app", "doll");
         params.put("act", "operate_result");
-        params.put("platform", PLATFORM);
         params.put("log_id", logId);
         params.put("ts", System.currentTimeMillis());
         String value = doGet(url, params);
-        return toBean(value, QiygOperateResultDTO.class);
-    }*/
+        return toBean(value, WWOperateResultDTO.class);
+    }
 
 //    /**
 //     * 默认概率调整， 范围1-888
@@ -183,10 +175,10 @@ public abstract class WawaMachine {
         }
         try {
             JavaType paramType = createJavaType(parameterClasses);
-            JavaType javaType = typeFactory.constructParametricType(QiygRespDTO.class, paramType);
-            QiygRespDTO<T> result = JSONUtil.jsonToBean(value, javaType);
-            if (result != null && result.getDone() && result.getRetval() != null) {
-                return result.getRetval();
+            JavaType javaType = typeFactory.constructParametricType(RespDTO.class, paramType);
+            RespDTO<T> result = JSONUtil.jsonToBean(value, javaType);
+            if (result != null && result.getCode() == 1 && result.getData() != null) {
+                return result.getData();
             }
         } catch (Exception e) {
             e.printStackTrace();
