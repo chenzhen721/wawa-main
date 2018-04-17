@@ -53,8 +53,6 @@ class WawaPublicController extends BaseController {
     public static final int MIN_ROOM_COUNT = isTest ? 2 : 6
 
     @Resource
-    private QiyiguoController qiyiguoController
-    @Resource
     private WawaController wawaController
     @Resource
     private UserController userController
@@ -208,7 +206,7 @@ class WawaPublicController extends BaseController {
                     def query = $$(type: [$nin: type_list], timestamp: [$gte: new Date().clearTime().getTime(), $lte: System.currentTimeMillis() - 300000L])
                     def list = catch_records().find(query).sort($$(n: 1)).limit(2).toArray()
                     for(DBObject obj : list) {
-                        logger.debug('==============record id:' + obj['_id'])
+                        /*logger.debug('==============record id:' + obj['_id'])
                         WWOperateResultDTO operateResultDTO = WawaMachine.operateResult(obj['log_id'] as String)
                         def record = [:]
                         def inc = [:]
@@ -247,7 +245,7 @@ class WawaPublicController extends BaseController {
                                 }
                             }
                             wawaController.deleteIfNE(obj['room_id'] as Integer, obj['_id'] as String, obj['user_id'] as Integer)
-                        }
+                        }*/
                     }
                 } catch (Exception e) {
                     logger.error('=========loop error: {}', e)
@@ -436,23 +434,17 @@ class WawaPublicController extends BaseController {
      * @param req
      */
     def callback(HttpServletRequest req) {
-        def platform = ServletRequestUtils.getStringParameter(req, 'platform', Qiyiguo.PLATFORM)
-        def user_id = ServletRequestUtils.getIntParameter(req, 'user_id')
         def log_id = ServletRequestUtils.getStringParameter(req, 'log_id')
-        def device_id = ServletRequestUtils.getStringParameter(req, 'device_id')
-        def address = ServletRequestUtils.getStringParameter(req, 'address', '')
-        def consignee = ServletRequestUtils.getStringParameter(req, 'consignee', '')
-        def mobile = ServletRequestUtils.getStringParameter(req, 'mobile', '')
-        def operate_result = ServletRequestUtils.getIntParameter(req, 'operate_result')
-        def goods_id = ServletRequestUtils.getIntParameter(req, 'goods_id')
+        def record_id = ServletRequestUtils.getStringParameter(req, 'record_id')
+        def operate_result = ServletRequestUtils.getStringParameter(req, 'operate_result')
         def remoteSign = ServletRequestUtils.getStringParameter(req, 'sign')
         def ts = ServletRequestUtils.getStringParameter(req, 'ts')
         logger.info('===============receive callback msg from remote: ' + req.parameterMap)
-        return result_callback(platform, user_id, log_id, device_id, operate_result, goods_id, remoteSign, ts, address, consignee, mobile)
+        return result_callback(log_id, record_id, operate_result, remoteSign, ts)
     }
 
-    def result_callback(String platform, Integer user_id, String log_id, String device_id, Integer operate_result, Integer goods_id, String remoteSign, String ts, String address, String consignee, String mobile) {
-        def params = [platform: platform, user_id: user_id, log_id: log_id, device_id: device_id, address: address, consignee: consignee, mobile: mobile, operate_result: operate_result, goods_id: goods_id, ts: ts]
+    def result_callback(String log_id, String record_id, String operate_result, String remoteSign, String ts) {
+        def params = [log_id: log_id, record_id: record_id, operate_result: operate_result, ts: ts]
         def localSign = createSign(params)
         logger.error('===============receive wawa callback. local sign: ' + localSign + ' remote:' + remoteSign)
         /*if (localSign != remoteSign) {
@@ -461,18 +453,19 @@ class WawaPublicController extends BaseController {
         }*/
 
         //查询是否有此订单，记录log;若无则记录异常并返回
-        def records = catch_records().findOne($$(user_id: user_id, log_id: log_id))
+        def records = catch_records().findOne($$(_id: record_id, log_id: log_id))
         logger.info('===============receive callback records:' + records)
         if (records == null) {
             return [code: 0]
         }
-        def data = operate_result == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString()
+        def user_id = records['user_id'] as Integer
         def record = $$(log_id: log_id, operate_result: operate_result, timestamp: System.currentTimeMillis())
         //抓取结果(最终的结果)
-        def status = Boolean.parseBoolean(data)
+        def status = Boolean.parseBoolean(operate_result)
+        //todo 录像回放，最后一步
         def replay_url = "${GIF_DOMAIN}${new Date().format('yyyyMMdd')}/${records['room_id']}/${records['_id']}.gif".toString()
         def n = catch_records().update($$(_id: records['_id'], type: [$ne: CatchRecordType.结束.ordinal()]),
-                $$($set: [type: 2, status: status, play_record: record, replay_url: replay_url, goods_id: goods_id]), false, false, writeConcern).getN()
+                $$($set: [type: 2, status: status, play_record: record, replay_url: replay_url]), false, false, writeConcern).getN()
         //logger.info("callback update ${log_id}, ${user_id}".toString())
         def award_points = records['award_points'] as Boolean ?: false //是否奖励抓取积分
         //给用户送积分
@@ -490,7 +483,6 @@ class WawaPublicController extends BaseController {
             if (status) {
                 is_first = isFirst(user_id)
                 records.put('replay_url', replay_url)
-                records.put('goods_id', goods_id)
                 saveSuccessRecord(records)
                 // 抓中后全房间发送提示
                 RoomMsgPublish.publish2GlobalEvent([type: CatchMsgType.抓中全站提示.ordinal(), toy_name: name, user: user, device_type: records['device_type']])
@@ -501,12 +493,11 @@ class WawaPublicController extends BaseController {
             if (points != null) {
                 obj.put('points', points)
             }
+            //是否继续
             wawaController.continue_notify(roomId, user_id, records['_id'] as String, obj)
             //兜底 延迟6.5秒后发送结束消息 desc需要改
             wawaController.addTask(wawaController.result_notify_queue, records['room_id'] as Integer, user_id, [record_id: records['_id']], 6500L)
         }
-        //RoomMsgPublish.roomVideoPause(records['room_id'], records['_id'])
-        //RoomMsgPublish.roomVideoDispatchPause(records['room_id'], records['_id'])
 
         // 抓必中调整
         //unlimit_check(user_id, records['cost'] as Long, status)
@@ -523,8 +514,7 @@ class WawaPublicController extends BaseController {
                     coin: records['coin'],
                     timestamp: records['timestamp'],
                     replay_url: records['replay_url'],
-                    goods_id: records['goods_id'],
-                    channel: records['channel'] ?: CatchPostChannel.奇异果.ordinal(),
+                    channel: records['channel'] ?: CatchPostChannel.默认渠道.ordinal(),
                     is_delete: false,
                     is_award: false,
                     toy_points: records['toy_points']
@@ -601,62 +591,5 @@ class WawaPublicController extends BaseController {
         params.put("goods_id", param.get('goods_id'))
         params.put("ts", param.get('ts'))
         return Qiyiguo.creatSign(params)
-    }
-
-    /**
-     *
-     *    order_id	订单ID	如：7432
-     *    status	订单状态（30:已发货）	如：30
-     *    mode	物流方式 EXPRESS  使用物流订单 NO_EXPRESS 无需物流	如：EXPRESS
-     *    shipping_no	物流单号	如：420679234230
-     *    shipping_com	物流公司标识，用于快递100查询单号的参数	如：shunfeng
-     *    shipping_name	物流公司名字	如：“顺丰”
-     *    shipping_memo	发货人备注	如：“已发货”
-     *    shipping_time	发货时间	如：1511079568
-     *
-     */
-    def order_callback(HttpServletRequest req) {
-        def is_edit = ServletRequestUtils.getStringParameter(req, 'is_edit', '')
-        def order_id = ServletRequestUtils.getStringParameter(req, 'order_id')
-        def status = ServletRequestUtils.getStringParameter(req, 'status', '')
-        def mode = ServletRequestUtils.getStringParameter(req, 'mode', '')
-        def shipping_no = ServletRequestUtils.getStringParameter(req, 'shipping_no', '')
-        def shipping_com = ServletRequestUtils.getStringParameter(req, 'shipping_com', '')
-        def shipping_name = ServletRequestUtils.getStringParameter(req, 'shipping_name', '')
-        def shipping_memo = ServletRequestUtils.getStringParameter(req, 'shipping_memo', '')
-        def shipping_time = ServletRequestUtils.getStringParameter(req, 'shipping_time', '')
-        def ts = ServletRequestUtils.getIntParameter(req, 'ts')
-        def remoteSign = ServletRequestUtils.getStringParameter(req, 'sign')
-        logger.info('===============receive order_callback msg from remote: ' + req.parameterMap)
-        SortedMap<String, Object> params = new TreeMap<>()
-        params.put("platform", Qiyiguo.PLATFORM)
-        params.put("is_edit", is_edit)
-        params.put("order_id", order_id)
-        params.put("status", status)
-        params.put("mode", mode)
-        params.put("shipping_no", shipping_no)
-        params.put("shipping_com", shipping_com)
-        params.put("shipping_name", shipping_name)
-        params.put("shipping_memo", shipping_memo)
-        params.put("shipping_time", shipping_time)
-        params.put("timestamp", System.currentTimeMillis())
-        params.put("ts", ts)
-        def localSign = Qiyiguo.creatSign(params)
-        logger.info('===============receive qiyiguo order_callback. local sign: ' + localSign + ' remote from:' + remoteSign)
-        /*if (localSign != remoteSign) {
-            logger.info('===============receive qiyiguo order_callback error. local sign: ' + localSign + ' missmatch from:' + remoteSign)
-            return Result.error
-        }*/
-        //查询是否有此订单
-        def post_log = catch_post_logs().findOne($$(order_id: order_id))
-        if (post_log == null) {
-            logger.error('none order_id found:' + req.getParameterMap())
-            return Result.error
-        }
-        if (1 == catch_post_logs().update($$(_id: post_log['_id'], post_type: CatchPostType.已发货.ordinal()),
-                $$($set: [post_info: params, post_type: CatchPostType.已同步订单.ordinal()]), false, false, writeConcern).getN()) {
-            return Result.success
-        }
-        return Result.error
     }
 }

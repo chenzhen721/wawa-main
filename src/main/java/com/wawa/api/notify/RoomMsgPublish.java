@@ -23,21 +23,21 @@ public class RoomMsgPublish {
     static final Logger logger = LoggerFactory.getLogger(RoomMsgPublish.class);
 
     // ws服务器地址
-    private static final String WS_SERVER_URL = AppProperties.get("ws.domain");
+    private static final String WS_SERVER_URL = AppProperties.get("im.domain");
     //private static final String WS_VIDEO_SERVER_URL = AppProperties.get("wsvideo.domain");
 
     // 推送用户信息api
-    private static final String PUBLIISH_USER_API = "/api/publish/user/ID";
+    private static final String PUBLIISH_USER_API = "/message/user_message?user_id=ID";
 
     // 推送房间信息api
-    private static final String PUBLIISH_ROOM_API = "/api/publish/room/ID";
-    private static final String ROOM_VIDEO_RESTART_API = "/api/video/restart/ID/RECORDID";
-    private static final String ROOM_VIDEO_PAUSE_API = "/api/video/pause/ID/RECORDID";
+    private static final String PUBLIISH_ROOM_API = "/message/room_message?room_id=ID";
+//    private static final String ROOM_VIDEO_RESTART_API = "/api/video/restart/ID/RECORDID";
+//    private static final String ROOM_VIDEO_PAUSE_API = "/api/video/pause/ID/RECORDID";
     //private static final String ROOM_DISPATCH_START_API = "/api/dispatch/start";
     //private static final String ROOM_DISPATCH_PAUSE_API = "/api/dispatch/pause";
 
     // 全局推送api
-    private static final String PUBLIISH_GLOBAL_API = "/api/publish/global";
+    private static final String PUBLIISH_GLOBAL_API = "/message/global_message";
 
     // 全局推送action
     static final String GLOBAL_ACTION = "global.marquee";
@@ -60,9 +60,9 @@ public class RoomMsgPublish {
     /**
      * 推流启动
      */
-    public static void roomVideoRestart(Object roomId, Object recordId) {
+    /*public static void roomVideoRestart(Object roomId, Object recordId) {
         publish(roomVideoRestartUrl(roomId.toString(), recordId.toString()), "", new HashMap(), false);
-    }
+    }*/
 
     /*public static void roomVideoDispatchRestart(Object roomId, Object recordId) {
         Map<String, Object> data = new HashMap<>();
@@ -75,9 +75,9 @@ public class RoomMsgPublish {
      * 视频流暂停
      * @param roomId
      */
-    public static void roomVideoPause(Object roomId, Object recordId) {
+    /*public static void roomVideoPause(Object roomId, Object recordId) {
         publish(roomVideoPauseUrl(roomId.toString(), recordId.toString()), "", new HashMap(), false);
-    }
+    }*/
 
     /*public static void roomVideoDispatchPause(Object roomId, Object recordId) {
         Map<String, Object> data = new HashMap<>();
@@ -143,17 +143,17 @@ public class RoomMsgPublish {
         return String.format("%s%s", WS_SERVER_URL, PUBLIISH_ROOM_API.replace("ID", roomId));
     }
 
-    private static String roomVideoRestartUrl(String roomId, String recordId) {
+    /*private static String roomVideoRestartUrl(String roomId, String recordId) {
         return String.format("%s%s", WS_SERVER_URL, ROOM_VIDEO_RESTART_API.replace("RECORDID", recordId).replace("ID", roomId));
-    }
+    }*/
 
     /*private static String roomVideoDispatchRestartUrl() {
         return String.format("%s%s", WS_VIDEO_SERVER_URL, ROOM_DISPATCH_START_API);
     }*/
 
-    private static String roomVideoPauseUrl(String roomId, String recordId) {
+    /*private static String roomVideoPauseUrl(String roomId, String recordId) {
         return String.format("%s%s", WS_SERVER_URL, ROOM_VIDEO_PAUSE_API.replace("RECORDID", recordId).replace("ID", roomId));
-    }
+    }*/
 
     /*private static String roomVideoDispatchPauseUrl() {
         return String.format("%s%s", WS_VIDEO_SERVER_URL, ROOM_DISPATCH_PAUSE_API);

@@ -83,7 +83,7 @@ class QiyiguoPublicController extends BaseController {
     private static final long delay = 5000L // 型号量
 
 
-    @PostConstruct
+//    @PostConstruct
     public void init2() {
         final String gif_domain = GIF_DOMAIN
         //游戏结束通知倒计时
@@ -534,7 +534,7 @@ class QiyiguoPublicController extends BaseController {
             //兜底 延迟6.5秒后发送结束消息 desc需要改
             qiyiguoController.addTask(qiyiguoController.result_notify_queue, records['room_id'] as Integer, user_id, [record_id: records['_id']], 6500L)
         }
-        RoomMsgPublish.roomVideoPause(records['room_id'], records['_id'])
+        //RoomMsgPublish.roomVideoPause(records['room_id'], records['_id'])
         //RoomMsgPublish.roomVideoDispatchPause(records['room_id'], records['_id'])
 
         // 抓必中调整

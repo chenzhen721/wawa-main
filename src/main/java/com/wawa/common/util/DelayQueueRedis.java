@@ -90,7 +90,7 @@ public class DelayQueueRedis {
     //添加task到延迟队列
     public void offer(Task task){
         mainRedis.opsForZSet().add(queue_key, JSONUtil.beanToJson(task), System.currentTimeMillis() + task.getDelayTime());
-        logger.debug(task.toString() + " >>>>>加入延时队列 " + DateUtil.getFormatDate(DateUtil.DFMT, System.currentTimeMillis()));
+        //logger.debug(task.toString() + " >>>>>加入延时队列 " + DateUtil.getFormatDate(DateUtil.DFMT, System.currentTimeMillis()));
     }
 
     public void clean(){

@@ -131,6 +131,7 @@ class WawaController extends BaseController{
         if (roomDTO != null) {
             def status = roomDTO.device_status
             room.putAll(room_player(roomId, status))
+            room.put('stream_uri', roomDTO.getStream_uri())
         }
 
         Integer price = null

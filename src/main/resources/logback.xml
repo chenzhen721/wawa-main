@@ -118,9 +118,9 @@
         <appender-ref ref="slowLogfile"/>
     </logger>
 
-    <logger name="com.wawa.web" level="ERROR">
+    <!--<logger name="com.wawa.web" level="ERROR">
         <appender-ref ref="${log.error.target}"/>
-    </logger>
+    </logger>-->
 
     <logger name="com.wawa.web.spring" level="INFO"/>
     <logger name="com.wawa.web" level="${log.web.level}"/>

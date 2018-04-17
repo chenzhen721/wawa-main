@@ -341,7 +341,7 @@
                 <api.domain>http://localhost:9002/</api.domain>
                 <user.domain>http://test-user.doll520.com/</user.domain>
                 <pic.domain>http://test-aiimg.sumeme.com/</pic.domain>
-                <im.domain>http://test-aiim.memeyule.com:6070</im.domain>
+                <im.domain>http://test-server.doll520.com</im.domain>
                 <server.domain>ws://test-server.doll520.com/machine</server.domain>
                 <stream.domain>ws://test-server.doll520.com/push</stream.domain>
                 <!--<wsvideo.domain>http://39.106.130.135:7600</wsvideo.domain>-->
@@ -396,7 +396,7 @@
                 <api.domain>http://test-api.doll520.com/</api.domain>
                 <site.domain>http://test.doll520.com/</site.domain>
                 <user.domain>http://test-user.doll520.com/</user.domain>
-                <im.domain>http://test-aiim.lezhuale.com:6070</im.domain>
+                <im.domain>http://test-server.doll520.com</im.domain>
                 <server.domain>ws://test-ws.doll520.com/machine</server.domain>
                 <stream.domain>ws://test-ws.doll520.com/push</stream.domain>
                 <!--<wsvideo.domain>http://test-v.17laihou.com:7600</wsvideo.domain>-->

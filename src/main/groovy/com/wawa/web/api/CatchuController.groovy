@@ -14,11 +14,9 @@ import com.wawa.common.util.JSONUtil
 import com.wawa.common.util.LabMsgExecutor
 import com.wawa.common.util.RandomExtUtils
 import com.wawa.model.CatchObserveStatus
-import com.wawa.model.CatchPostChannel
 import com.wawa.model.CatchPostStatus
 import com.wawa.model.CatchPostType
 import com.wawa.model.UserAwardType
-import com.wawa.web.partner.QiyiguoController
 import com.wawa.web.partner.WawaController
 import groovy.json.JsonSlurper
 import org.apache.commons.lang.StringUtils
@@ -208,7 +206,7 @@ class CatchuController extends BaseController {
                 rids.add(goods['room_id'])
             }*/
             //获取用户是否在某间房间内游戏
-            Integer userRoomId = QiyiguoController.Room.getPlayerRoomId(mainRedis, Web.currentUserId) as Integer
+            Integer userRoomId = WawaController.Room.getPlayerRoomId(mainRedis, Web.currentUserId) as Integer
             if (rids.contains(userRoomId)) {
                 room_id = userRoomId
             } else {

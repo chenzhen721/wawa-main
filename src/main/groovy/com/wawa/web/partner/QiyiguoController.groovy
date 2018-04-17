@@ -310,7 +310,7 @@ class QiyiguoController extends BaseController{
         def user = users().findOne(userId, $$(nick_name: 1, pic: 1))
         def obj = [type: CatchMsgType.游戏开始.ordinal(), result: record_id, user: user, timestamp: t, play_time: record['play_time']]
         RoomMsgPublish.publish2Room(roomId, MsgAction.抓娃娃, obj, false)
-        RoomMsgPublish.roomVideoRestart(roomId, record_id)
+        //RoomMsgPublish.roomVideoRestart(roomId, record_id)
         //RoomMsgPublish.roomVideoDispatchRestart(roomId, record_id)
 
         //增加一个延迟补偿队列, 到这个时间无论用户有没有收到回调都会弹出结果界面
