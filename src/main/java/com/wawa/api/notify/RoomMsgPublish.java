@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -35,6 +37,8 @@ public class RoomMsgPublish {
 //    private static final String ROOM_VIDEO_PAUSE_API = "/api/video/pause/ID/RECORDID";
     //private static final String ROOM_DISPATCH_START_API = "/api/dispatch/start";
     //private static final String ROOM_DISPATCH_PAUSE_API = "/api/dispatch/pause";
+
+    private static final String ROOM_VIEWER_API = "/message/room_users?room_id=ID";
 
     // 全局推送api
     private static final String PUBLIISH_GLOBAL_API = "/message/global_message";
@@ -105,6 +109,32 @@ public class RoomMsgPublish {
     private static void publish(String url, Map data) {
         String postJson = JSONUtil.beanToJson(data);
         publish(url, postJson);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> room_users(String roomId) {
+        String url = String.format("%s%s", WS_SERVER_URL, ROOM_VIEWER_API.replace("ID", roomId));
+        String resp;
+        try {
+            if (url.startsWith("http://")) {
+                resp = HttpClientUtils.get(url, null);
+            } else if (url.startsWith("https://")) {
+                resp = HttpsClientUtils.postJson(url, null);
+            } else {
+                logger.error("unknown schema: " + url);
+                return null;
+            }
+            Map result = JSONUtil.jsonToMap(resp);
+            if (!result.get("code").toString().equals("1")) {
+                logger.error("publish error ,resp is {}", resp);
+                return null;
+            }
+
+            return (List)result.get("data");
+        } catch (IOException e) {
+            logger.error("get room viewer exception.", e);
+        }
+        return null;
     }
 
     /**

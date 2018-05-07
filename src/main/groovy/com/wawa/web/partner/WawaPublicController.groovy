@@ -34,6 +34,8 @@ import org.springframework.web.bind.ServletRequestUtils
 import javax.annotation.PostConstruct
 import javax.annotation.Resource
 import javax.servlet.http.HttpServletRequest
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 import static com.wawa.common.doc.MongoKey.$inc
 import static com.wawa.common.doc.MongoKey.ALL_FIELD
@@ -47,7 +49,7 @@ class WawaPublicController extends BaseController {
 
     static final Logger logger = LoggerFactory.getLogger(WawaPublicController.class)
 
-    private static final String GIF_DOMAIN = AppProperties.get("gif.domain", "http://test-record.17laihou.com/")
+    private static final String GIF_DOMAIN = AppProperties.get("pic.domain", "http://test-static.doll520.com/")
     public static final String APP_ID = isTest ? "984069e5f8edd8ca4411e81863371f16" : "984069e5f8edd8ca4411e81863371f16"
     public static final JsonSlurper jsonSlurper = new JsonSlurper()
     public static final int MIN_ROOM_COUNT = isTest ? 2 : 6
@@ -462,8 +464,8 @@ class WawaPublicController extends BaseController {
         def record = $$(log_id: log_id, operate_result: operate_result, timestamp: System.currentTimeMillis())
         //抓取结果(最终的结果)
         def status = Boolean.parseBoolean(operate_result)
-        //todo 录像回放，最后一步
-        def replay_url = "${GIF_DOMAIN}${new Date().format('yyyyMMdd')}/${records['room_id']}/${records['_id']}.gif".toString()
+
+        def replay_url = "${GIF_DOMAIN}${new Date().format('yyyyMMdd')}/${records['_id']}.mp4".toString()
         def n = catch_records().update($$(_id: records['_id'], type: [$ne: CatchRecordType.结束.ordinal()]),
                 $$($set: [type: 2, status: status, play_record: record, replay_url: replay_url]), false, false, writeConcern).getN()
         //logger.info("callback update ${log_id}, ${user_id}".toString())

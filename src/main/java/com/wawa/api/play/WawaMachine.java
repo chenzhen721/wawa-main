@@ -70,16 +70,21 @@ public abstract class WawaMachine {
      *  2.娃娃机详情
      */
     public static WWRoomDTO room_detail(String roomId) {
-        if (roomId == null) {
-            return null;
-        }
         String url = HOST + "/public/info";
-        SortedMap<String, Object> params = new TreeMap<>();
-        params.put("app_id", APP_ID);
-        params.put("device_id", roomId);
-        params.put("ts", System.currentTimeMillis());
-        String value = doGet(url, params);
-        return toBean(value, WWRoomDTO.class);
+        try {
+            if (roomId == null) {
+                return null;
+            }
+            SortedMap<String, Object> params = new TreeMap<>();
+            params.put("app_id", APP_ID);
+            params.put("device_id", roomId);
+            params.put("ts", System.currentTimeMillis());
+            String value = doGet(url, params);
+            return toBean(value, WWRoomDTO.class);
+        } catch (Exception e) {
+            logger.error("error to get " + url, e);
+        }
+        return null;
     }
 
 //    /**

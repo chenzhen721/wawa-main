@@ -131,7 +131,7 @@ class WawaController extends BaseController{
         if (roomDTO != null) {
             def status = roomDTO.device_status
             room.putAll(room_player(roomId, status))
-            room.put('stream_uri', roomDTO.getStream_uri())
+            room.put('pull_stream', roomDTO.getPull_stream())
         }
 
         Integer price = null
@@ -300,6 +300,7 @@ class WawaController extends BaseController{
             }
             return Result.余额不足
         }
+        //todo 开启录像
         if (!catch_records().save($$(record), writeConcern)) {
             logger.error('catchu start error. record:' + record)
             mainRedis.delete(Room.hash(roomId))

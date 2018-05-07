@@ -8,7 +8,7 @@ public class WWRoomDTO {
 
     private String _id; //设备id
     private String name; //设备名称
-    private String stream_uri; //视频流socket地址
+    private String pull_stream; //视频流socket地址
     private String online_status; //on off
     private int device_status; //机器状态 0-空闲 1-游戏中 2-维护中
 
@@ -28,12 +28,12 @@ public class WWRoomDTO {
         this.name = name;
     }
 
-    public String getStream_uri() {
-        return stream_uri;
+    public String getPull_stream() {
+        return pull_stream;
     }
 
-    public void setStream_uri(String stream_uri) {
-        this.stream_uri = stream_uri;
+    public void setPull_stream(String pull_stream) {
+        this.pull_stream = pull_stream;
     }
 
     public String getOnline_status() {

@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject
 import com.mongodb.DBCollection
 import com.mongodb.DBObject
 import com.mongodb.QueryBuilder
+import com.wawa.api.notify.RoomMsgPublish
 import com.wawa.base.BaseController
 import com.wawa.base.Crud
 import com.wawa.base.anno.Rest
@@ -176,7 +177,9 @@ class PublicController extends BaseController {
         int page = Web.getPage(req)
         int pageSize = Web.getPageSize(req)
         Integer room_id = Web.roomId(req)
-        Set<String> viewers = userRedis.opsForSet().members(KeyUtils.ROOM.users(room_id))
+        //这个观众列表可以从im系统中访问获取
+//        Set<String> viewers = userRedis.opsForSet().members(KeyUtils.ROOM.users(room_id))
+        List<String> viewers = RoomMsgPublish.room_users("" + room_id)
         /*Set<String> robots = userRedis.opsForSet().members(KeyUtils.ROOM.robots(room_id))
         if (robots != null && robots.size() > 0) {
             viewers.addAll(robots)
@@ -201,7 +204,7 @@ class PublicController extends BaseController {
     }
 
 
-    private getUids(Set<String> viewers) {
+    private getUids(List<String> viewers) {
         def uids = viewers.collect {
             try {
                 String id = (String) it
